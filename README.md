@@ -6,6 +6,7 @@ You can run this shiny web app in RStudio (or R) by opening up an R or RStudio s
 
 
 install.packages(c("shiny", "shinyjs", "Rcpp")
+
 library(shiny)
 
 runGitHub("mmejWebTool", "Dobbs-Lab")
