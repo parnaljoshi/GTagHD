@@ -75,6 +75,10 @@ shinyUI(
                
                p(""),
                
+               actionLink("exampleEnsembl", 
+                          label = "Example For ENSEMBL Function"),
+               
+               p(""),
                actionLink("reset", 
                           label = "Reset Form")
              )),
@@ -127,7 +131,8 @@ shinyUI(
                #This panel displays if the user wants to use an ENSEMBL gene ID
                conditionalPanel(
                   condition = "input.cDNAtype == 1",
-                  p("Warning: Using this function with larger genes can produce snarls."),
+                  #p("Warning: Using this function with larger genes can produce snarls."),
+                  p("Warning: This function is still in the testing phase."),
                   #Choose the species - required for bioMart
                   p("Please select the species:"),
                   selectInput("species", 
@@ -136,7 +141,7 @@ shinyUI(
                                              "Zebrafish" = 1,
                                              "Fruitfly" = 2),
                                             # "Maize" = 3),
-                              selected = 1),
+                              selected = 0),
                   
                   textInput("geneId", 
                             label = "", 
