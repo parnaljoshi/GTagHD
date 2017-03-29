@@ -323,13 +323,13 @@ getPadding <- function(padding){
 
 ########################
 #Ensembl stuff
-#ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 #
-#getEnsemblSequence <- function(martName, dataSetType, geneId){
-#  ensembl <- useMart(martName, dataset = dataSetType)
-#  ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
-#  ensSeq <- getSequence(type = "ensembl_gene_id", chromosome = ensCoords[1,2], start = ensCoords[1,3], end = ensCoords[1,4],  seqType = "cdna", mart = ensembl)
+getEnsemblSequence <- function(martName, dataSetType, geneId){
+  ensembl <- useMart(martName, dataset = dataSetType)
+  ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
+  ensSeq <- getSequence(type = "ensembl_gene_id", chromosome = ensCoords[1,2], start = ensCoords[1,3], end = ensCoords[1,4],  seqType = "cdna", mart = ensembl)
   
-#  seq <- biomaRt:::getSequence(id="ENSG00000146648", type = "ensembl_gene_id", seqType = "cdna", mart = ensembl)
-#}
+  seq <- biomaRt:::getSequence(id="ENSG00000146648", type = "ensembl_gene_id", seqType = "cdna", mart = ensembl)
+}
 
