@@ -134,8 +134,8 @@ shinyUI(
                               label = "", 
                               choices = list("Human" = 0, 
                                              "Zebrafish" = 1,
-                                             "Fruitfly" = 2,
-                                             "Maize" = 3),
+                                             "Fruitfly" = 2),
+                                            # "Maize" = 3),
                               selected = 1),
                   
                   textInput("geneId", 
