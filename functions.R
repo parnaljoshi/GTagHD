@@ -323,13 +323,26 @@ getPadding <- function(padding){
 
 ########################
 #Ensembl stuff
-ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-#
-getEnsemblSequence <- function(martName, dataSetType, geneId){
-  ensembl <- useMart(martName, dataset = dataSetType)
-  ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
-  ensSeq <- getSequence(type = "ensembl_gene_id", chromosome = ensCoords[1,2], start = ensCoords[1,3], end = ensCoords[1,4],  seqType = "cdna", mart = ensembl)
+getEnsemblSeq <- function(martName, dataSetType, geneId, targetSeq, gRNA, mh){
+  #Create dataset with specified mart
+  gMart <- useMart("ensembl", dataset = dset)
+  #Get the coding sequences corresponding to the given gene ID
+  seq <- biomaRt:::getSequence(id = geneId, type = "ensembl_gene_id", seqType = "coding", mart = gMart)
+  #Identify which coding sequences have the target
+  codingSeqTarget <- seq[1,grep(targetSeq, seq)]
   
-  seq <- biomaRt:::getSequence(id="ENSG00000146648", type = "ensembl_gene_id", seqType = "cdna", mart = ensembl)
+  #Identify how many times target occurs in coding sequence
+  targetLocation <- unlist(str_locate_all(codingSeqTarget, targetSeq))
+  
+  #Determine the # of padding nucleotides needed to fix break
+  padding <- if(((targetLocation[1] - 1) %% 3) == 0){
+    0
+  } else if(((targetLocation[1] - 1) %% 3) == 1){
+    2
+  } else if(((targetLocation[1] - 1) %% 3) == 2){
+    1
+  }
+  
+  return(doCalculations(codingSeqTarget, targetSeq, gRNA, mh, padding))
 }
 
