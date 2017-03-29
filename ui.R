@@ -35,10 +35,18 @@ shinyUI(
                ))),
                
                mainPanel(
+                 #tags$div("We can put information about labs, collaborations, etc."),
+                 #tags$div("And/or information about how the tool works."),
+                 tags$img(src = "Iowa_State_Cyclones_logo.svg.png", 
+                          height = "200px", 
+                          width = "290px"),
+                 tags$img(src = "mayoclinic.jpeg", 
+                          height = "218px", 
+                          width = "200px"),
                  p("The MMEJ Web Tool can automatically create CRISPR targeting oligos designed to support microhomology mediated end joining."),
                  p(""),
                  p('To use the tool, choose the "Submit Single Job" tab.'),
-                 p("In 1, you can choose to use a universal guide RNA designed to function with the ____ plasmid, or submit a custom guide RNA for use with a plasmid of your choice."),
+                 p("In 1, you can choose to use a universal guide RNA designed to function with the universal series plasmid, or submit a custom guide RNA for use with a plasmid of your choice."),
                  p("In 2, you must enter your CRISPR target sequence. This squence should be 23 bp long - 20 bases as the target, and a PAM sequence in the form of either 'CCN' or 'GGN' at the beginning of the sequence, or 'NCC' or 'NGG' at the end of the sequence."),
                  p("In 3, you can paste a section of cDNA containing your CRISPR target in (2). Please note that your CRISPR target should appear exactly once in either the forward or reverse complement direction of the cDNA sequence."),
                  p("We will support automatically downloading a cDNA sequence, based on a gene ID, shortly."),
@@ -49,14 +57,7 @@ shinyUI(
                  p("If no errors are present, you can press the 'Submit' button at the bottom of the page to generate your targeting oligos."),
                  p(""),
                  p("You can also see an example of the inputs using the 'Example' link on the left hand column of the 'Submit Single Job' page.")
-                 #tags$div("We can put information about labs, collaborations, etc."),
-                 #tags$div("And/or information about how the tool works."),
-                 #tags$img(src = "mayoclinic.jpeg", 
-                  #    height = "218px", 
-                  #     width = "200px"),
-                 #tags$img(src = "Iowa_State_Cyclones_logo.svg.png", 
-                  #        height = "200px", 
-                  #       width = "290px")
+
                )
              )
              
