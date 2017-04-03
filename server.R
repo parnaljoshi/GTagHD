@@ -274,12 +274,18 @@ shinyServer(function(input, output, session) {
     } else if(input$species == 2){
         "dmelanogaster_gene_ensembl"
     }
-      
-    oligos <- getEnsemblSequence(dset,
-                                 input$geneId, 
-                                 toupper(input$crisprSeq), 
-                                 input$gRNA, 
-                                 input$mh)
+
+    if(input$gRNAtype == 1){
+      guideRNA <- ""
+    } else {
+      guideRNA <- toupper(input$gRNA)
+    }
+    
+    oligos <- getEnsemblSeq(dset,
+                            input$geneId, 
+                            toupper(input$crisprSeq), 
+                            guideRNA, 
+                            input$mh)
     
     #Print out the 5' forward oligo
     output$fivePF <- renderText({
@@ -302,13 +308,13 @@ shinyServer(function(input, output, session) {
     })
   })
 
-  getEnsemblSequence <- function(martName, dataSetType, geneId){
-    ensembl <- useMart(martName, dataset = dataSetType)
-    ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
-    ensSeq <- getSequence(type = "ensembl_gene_id", chromosome = ensCoords[1,2], start = ensCoords[1,3], end = ensCoords[1,4],  seqType = "cdna", mart = ensembl)
+  #getEnsemblSequence <- function(martName, dataSetType, geneId){
+  #  ensembl <- useMart(martName, dataset = dataSetType)
+  #  ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
+  #  ensSeq <- getSequence(type = "ensembl_gene_id", chromosome = ensCoords[1,2], start = ensCoords[1,3], end = ensCoords[1,4],  seqType = "cdna", mart = ensembl)
     
-    seq <- biomaRt:::getSequence(id="ENSG00000146648", type = "ensembl_gene_id", seqType = "coding", mart = ensembl)
-  }
+  #  seq <- biomaRt:::getSequence(id="ENSG00000146648", type = "ensembl_gene_id", seqType = "coding", mart = ensembl)
+  #}
   
   ########################################################
   #####################SIDEBAR STUFF######################
@@ -355,6 +361,18 @@ shinyServer(function(input, output, session) {
     output$threePR <- renderText({
       ""
     })
+  })
+  
+  observeEvent(input$exampleEnsembl, {
+    #Reset the inputs to their default values
+    updateRadioButtons(session, "gRNAtype", selected = 1)
+    updateSliderInput(session, "mh", value = 24)
+    
+    #Reset the inputs that will not be overwritten to their default values
+    updateRadioButtons(session, "cDNAtype", selected = 1)
+    updateSelectInput(session, "species", selected = 0)
+    updateTextInput(session, "geneId", value = "ENSG00000146648")
+    updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGCAGG")
   })
 
 })
