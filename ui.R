@@ -279,6 +279,14 @@ shinyUI(
       tags$div("Funding", style = "color:white"),
       titlePanel(""),
       p("R24 Grant Stuff Here!")
+    ),
+    
+    
+    ######STATUS and CHANGELOG#####
+    tabPanel(
+      tags$div("Change Log", style = "color:white"),
+      titlePanel(""),
+      includeText("www/changelog.txt")
     )
   
 ))
