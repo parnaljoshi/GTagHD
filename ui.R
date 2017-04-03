@@ -146,9 +146,9 @@ shinyUI(
                   textInput("geneId", 
                             label = "", 
                             value = "", 
-                            placeholder = "Paste ENSEMBL gene ID here..."),
+                            placeholder = "Paste ENSEMBL gene ID here...")
 
-                  actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
+                  
                   
                ),
                
@@ -223,7 +223,15 @@ shinyUI(
                
                
                ############SUBMIT####################
-               actionButton("submit", label = "Submit"),
+               conditionalPanel(
+                 condition = "input.cDNAtype == 2",
+                 actionButton("submit", label = "Submit")
+               ),
+               conditionalPanel(
+                 condition = "input.cDNAtype == 1",
+                 actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
+               ),
+               
                
                p(""),
                p(""),
