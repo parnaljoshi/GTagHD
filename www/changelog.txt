@@ -1,9 +1,0 @@
-2017-04-03 v0.0.1
-*Added ability to use ENSEMBL gene ID instead of cDNA sequence
-*Added support for searching the reverse complement of the cDNA sequence
-
-Known Issues:
-*Crash to desktop when submitting invalid inputs
-
-Next update:
-*Validation checks for ENSEMBL inputs
