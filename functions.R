@@ -323,7 +323,7 @@ getPadding <- function(padding){
 
 ########################
 #Ensembl stuff
-getEnsemblSeq <- function(martName, dataSetType, geneId, targetSeq, gRNA, mh){
+getEnsemblSeq <- function(dset, geneId, targetSeq, gRNA, mh){
   #Create dataset with specified mart
   gMart <- useMart("ensembl", dataset = dset)
   #Get the coding sequences corresponding to the given gene ID
