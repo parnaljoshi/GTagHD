@@ -1,6 +1,8 @@
 # mmejWebTool
-A repository for the MMEJ Web Tool
-You can run this shiny web app in RStudio (or R) by opening up an R or RStudio session, and running the following code:
+
+#A repository for the MMEJ Web Tool
+
+#You can run this shiny web app in RStudio (or R) by opening up an R or RStudio session, and running the following code:
 
 
 #Run first time you run this tool on a computer:
@@ -20,4 +22,4 @@ library(shiny)
 runGitHub("mmejWebTool", "Dobbs-Lab")
 
 
-You're all set!
+#You're all set!
