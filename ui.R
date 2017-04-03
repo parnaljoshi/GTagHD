@@ -286,7 +286,7 @@ shinyUI(
     tabPanel(
       tags$div("Change Log", style = "color:white"),
       titlePanel(""),
-      includeText("www/changelog.txt")
+      includeHTML("www/changelog.html")
     )
   
 ))
