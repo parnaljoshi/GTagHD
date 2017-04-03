@@ -322,6 +322,7 @@ shinyServer(function(input, output, session) {
   
   #Input an example to demonstrate
   observeEvent(input$example, {
+    reset()
     #Reset the inputs that will not be overwritten to their default values
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateRadioButtons(session, "cDNAtype", selected = 2)
@@ -335,6 +336,26 @@ shinyServer(function(input, output, session) {
   
   #Clear the form
   observeEvent(input$reset, {
+    reset()
+  })
+  
+  observeEvent(input$exampleEnsembl, {
+    reset()
+    
+    #Reset the inputs to their default values
+    updateRadioButtons(session, "gRNAtype", selected = 1)
+    updateSliderInput(session, "mh", value = 24)
+    
+    #Reset the inputs that will not be overwritten to their default values
+    updateRadioButtons(session, "cDNAtype", selected = 1)
+    updateSelectInput(session, "species", selected = 0)
+    updateTextInput(session, "geneId", value = "ENSG00000146648")
+    updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGCAGG")
+  })
+
+  
+  #Reset function
+  reset <- function(){
     #Reset the inputs to their default values
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateTextInput(session, "gRNA", value = NA)
@@ -361,18 +382,5 @@ shinyServer(function(input, output, session) {
     output$threePR <- renderText({
       ""
     })
-  })
-  
-  observeEvent(input$exampleEnsembl, {
-    #Reset the inputs to their default values
-    updateRadioButtons(session, "gRNAtype", selected = 1)
-    updateSliderInput(session, "mh", value = 24)
-    
-    #Reset the inputs that will not be overwritten to their default values
-    updateRadioButtons(session, "cDNAtype", selected = 1)
-    updateSelectInput(session, "species", selected = 0)
-    updateTextInput(session, "geneId", value = "ENSG00000146648")
-    updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGCAGG")
-  })
-
+  }
 })
