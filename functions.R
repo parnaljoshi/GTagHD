@@ -75,7 +75,7 @@ getGenomicCutSite <- function(dnaSeq, crisprSeq){
 #'
 #' @examples
 
-get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding){
+get5Prime <- function(dnaSeq, gRNAType, crisprSeq, gRNA, mh, cutSite, padding){
   
   #Get the homologous section from the genome
   homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
@@ -92,8 +92,8 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding){
     fivePrimeF <- paste0("aattc", fivePrimeFBase, "g")
     fivePrimeR <- paste0("ggatc", reverseComplement(fivePrimeFBase), "g")
   } else {
-    fivePrimeF <- fivePrimeFBase
-    fivePrimeR <- reverseComplement(fivePrimeFBase)
+    fivePrimeF <- paste0("gcgg", fivePrimeFBase)
+    fivePrimeR <- paste0("atcc", reverseComplement(fivePrimeFBase))
   }
   
   return(c(fivePrimeF, fivePrimeR))
@@ -125,12 +125,11 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
   #Add cloning sites if needed
   if(nchar(passSeq) > 0){
     threePrimeF <- paste0("catgg", threePrimeFBase, "c")
+    threePrimeR <- paste0("ggccg", reverseComplement(threePrimeFBase), "c")
     
-    #TODO CHECK THIS SEQ CORRECT
-    threePrimeR <- paste0("gccgg", reverseComplement(threePrimeFBase), "c")
   } else {
-    threePrimeF <- threePrimeFBase
-    threePrimeR <- reverseComplement(threePrimeFBase)
+    threePrimeF <- paste0("aag", threePrimeFBase)
+    threePrimeR <- paste0(reverseComplement(threePrimeFBase), "ccg")
   }
   
   return(c(threePrimeF, threePrimeR))
