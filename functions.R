@@ -75,7 +75,7 @@ getGenomicCutSite <- function(dnaSeq, crisprSeq){
 #'
 #' @examples
 
-get5Prime <- function(dnaSeq, gRNAType, crisprSeq, gRNA, mh, cutSite, padding){
+get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding){
   
   #Get the homologous section from the genome
   homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
