@@ -212,7 +212,7 @@ shinyServer(function(input, output, session) {
   #Do the calculation for the targeting oligos
   
   observeEvent(input$submit, {
-    
+    resetOutputs()
     #Convert inputs to uppercase
     if(input$gRNAtype == 1){
       guideRNA <- ""
@@ -249,6 +249,7 @@ shinyServer(function(input, output, session) {
   
   #Get cDNA/coding sequence from ENSEMBL
   observeEvent(input$geneIdSubmit, {
+    resetOutputs()
     dset <- if(input$species == 0){
       "hsapiens_gene_ensembl"
     } else if(input$species == 1){
