@@ -135,8 +135,8 @@ shinyUI(
                #This panel displays if the user wants to use an ENSEMBL gene ID
                conditionalPanel(
                   condition = "input.cDNAtype == 1",
-                  #p("Warning: Using this function with larger genes can produce snarls."),
-                  p("Warning: This function is still in the testing phase."),
+                  
+                  
                   #Choose the species - required for bioMart
                   p("Please select the species:"),
                   selectInput("species", 
