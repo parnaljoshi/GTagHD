@@ -146,7 +146,7 @@ shinyUI(
                                              "Fruitfly" = 2),
                                             # "Maize" = 3),
                               selected = 0),
-                  
+                  textOutput("validgeneid"),
                   textInput("geneId", 
                             label = "", 
                             value = "", 
