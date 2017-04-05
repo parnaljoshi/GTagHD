@@ -11,3 +11,7 @@ body,
   background-color: #a0181a !important;
   
 }
+
+.shiny-output-error-validation {
+  color: red;
+}
