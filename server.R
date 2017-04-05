@@ -137,44 +137,47 @@ shinyServer(function(input, output, session) {
   
   validMH <- reactive({
     
-    if((input$crisprSeq != "") & (input$cDNA != "")){
-      uDNA <- toupper(input$cDNA)
-      uCS <- toupper(input$crisprSeq)
-      
-      #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the FORWARD direction
-      count <- str_count(uDNA, uCS)
-      
-      #Count the instance in the reverse complement of the sequence
-      revCount <- str_count(reverseComplement(uDNA), uCS)
-      
-      #If the target appears in the reverseComplement of cDNA
-      if(revCount == 1 && count == 0){
-        uDNA <- reverseComplement(input$cDNA)
-      } 
-      
-      crisprLoc <- unlist(str_locate_all(uDNA, input$crisprSeq))
-      
-      #If the crispr ends with NGG (it is in the forward direction), cut before the PAM sequence:
-      if((substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "GG") | 
-         (substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "gg")){
-        cutIndex <- crisprLoc[2] - 6
+    if((input$crisprSeq != "") && (input$cDNA != "")){
+      if(is.null(input$crisprSeq) && (is.null(input$cDNA))){
+        uDNA <- toupper(input$cDNA)
+        uCS <- toupper(input$crisprSeq)
         
-        #If the crispr begins with CCN (it is in the reverse direction), cut after the PAM sequence:
-      } else if((substring(input$crisprSeq, 1, 2) == "CC") | (substring(input$crisprSeq, 1, 2) == "cc")){
-        cutIndex <- crisprLoc[1] + 5
+        #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the FORWARD direction
+        count <- str_count(uDNA, uCS)
+        
+        #Count the instance in the reverse complement of the sequence
+        revCount <- str_count(reverseComplement(uDNA), uCS)
+        
+        #If the target appears in the reverseComplement of cDNA
+        if(revCount == 1 && count == 0){
+          uDNA <- reverseComplement(input$cDNA)
+        } 
+        
+        crisprLoc <- unlist(str_locate_all(uDNA, input$crisprSeq))
+        
+        #If the crispr ends with NGG (it is in the forward direction), cut before the PAM sequence:
+        if((substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "GG") | 
+           (substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "gg")){
+          cutIndex <- crisprLoc[2] - 6
+          
+          #If the crispr begins with CCN (it is in the reverse direction), cut after the PAM sequence:
+        } else if((substring(input$crisprSeq, 1, 2) == "CC") | (substring(input$crisprSeq, 1, 2) == "cc")){
+          cutIndex <- crisprLoc[1] + 5
+        }
+        
+        validate(
+          if(revCount == 0 && count == 1){
+            need(cutIndex - input$mh >= 0, 
+                 paste0("Error: Microhomology length is too long for this CRISPR target sequence and cDNA pairing. ",
+                        "Choose a smaller homology length. Maximum allowed homology ", 
+                        "length for this cDNA/CRISPR pairing is ", 
+                        cutIndex - 1, " nucleotides."))
+          }
+        )
+        
+      }
       }
       
-      validate(
-        if(revCount == 0 && count == 1){
-          need(cutIndex - input$mh >= 0, 
-               paste0("Error: Microhomology length is too long for this CRISPR target sequence and cDNA pairing. ",
-                      "Choose a smaller homology length. Maximum allowed homology ", 
-                      "length for this cDNA/CRISPR pairing is ", 
-                      cutIndex - 1, " nucleotides."))
-        }
-      )
-      
-    }
   })
   
   ######################Gene ID############################
@@ -244,66 +247,75 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$submit, {
     resetOutputs()
-    #Convert inputs to uppercase
-    if(input$gRNAtype == 1){
-      guideRNA <- ""
-    } else {
-      guideRNA <- toupper(input$gRNA)
-    }
-    
-    ucDNA <- toupper(input$cDNA)
-    uCS <- toupper(input$crisprSeq)
-    
-    #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the FORWARD direction
-    count <- str_count(ucDNA, uCS)
-    
-    #Count the instance in the reverse complement of the sequence
-    revCount <- str_count(reverseComplement(ucDNA), uCS)
-    
-    #Checks to see if using reverseComplement of cDNA
-    if(revCount == 1 && count == 0){
-      uDNA <- reverseComplement(input$cDNA)
-    } else {
-      uDNA <- input$cDNA
-    }
-    
-    #Create the oligos
-    oligos <- doCalculations(toupper(uDNA), 
-                             toupper(input$crisprSeq), 
-                             guideRNA, 
-                             input$mh,  
-                             input$padding)
-    
-    printOutputs(oligos)
-    
+    #Check to ensure that all inputs are valid before accepting
+    if(is.null(validgRNA()) &&
+       is.null(validCrisprSeq()) &&
+       is.null(validCDNA()) &&
+       is.null(validMH())){
+      
+      resetOutputs()
+      #Convert inputs to uppercase
+      if(input$gRNAtype == 1){
+        guideRNA <- ""
+      } else {
+        guideRNA <- toupper(input$gRNA)
+      }
+      
+      ucDNA <- toupper(input$cDNA)
+      uCS <- toupper(input$crisprSeq)
+      
+      #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the FORWARD direction
+      count <- str_count(ucDNA, uCS)
+      
+      #Count the instance in the reverse complement of the sequence
+      revCount <- str_count(reverseComplement(ucDNA), uCS)
+      
+      #Checks to see if using reverseComplement of cDNA
+      if(revCount == 1 && count == 0){
+        uDNA <- reverseComplement(input$cDNA)
+      } else {
+        uDNA <- input$cDNA
+      }
+      
+      #Create the oligos
+      oligos <- doCalculations(toupper(uDNA), 
+                               toupper(input$crisprSeq), 
+                               guideRNA, 
+                               input$mh,  
+                               input$padding)
+      
+      printOutputs(oligos)
+    } 
   })
   
-  #Get cDNA/coding sequence from ENSEMBL
-  observeEvent(input$geneIdSubmit, {
-    resetOutputs()
-    dset <- if(input$species == 0){
-      "hsapiens_gene_ensembl"
-    } else if(input$species == 1){
-        "drerio_gene_ensembl"
-    } else if(input$species == 2){
-        "dmelanogaster_gene_ensembl"
-    }
 
-    if(input$gRNAtype == 1){
-      guideRNA <- ""
-    } else {
-      guideRNA <- toupper(input$gRNA)
-    }
-    
-    oligos <- getEnsemblSeq(dset,
-                            input$geneId, 
-                            toupper(input$crisprSeq), 
-                            guideRNA, 
-                            input$mh)
-    printOutputs(oligos)
-
-  })
-
+  
+  
+  
+#Get cDNA/coding sequence from ENSEMBL
+observeEvent(input$geneIdSubmit, {
+  resetOutputs()
+  dset <- if(input$species == 0){
+    "hsapiens_gene_ensembl"
+  } else if(input$species == 1){
+    "drerio_gene_ensembl"
+  } else if(input$species == 2){
+    "dmelanogaster_gene_ensembl"
+  }
+  
+  if(input$gRNAtype == 1){
+    guideRNA <- ""
+  } else {
+    guideRNA <- toupper(input$gRNA)
+  }
+  
+  oligos <- getEnsemblSeq(dset,
+                          input$geneId, 
+                          toupper(input$crisprSeq), 
+                          guideRNA, 
+                          input$mh)
+  printOutputs(oligos)
+})
   #Function to print the output
   printOutputs <- function(oligos){
     #Print out the 5' forward oligo
