@@ -243,25 +243,7 @@ shinyServer(function(input, output, session) {
                              input$mh,  
                              input$padding)
     
-    #Print out the 5' forward oligo
-    output$fivePF <- renderText({
-      oligos[1]
-    })
-    
-    #Print out the 5' reverse oligo
-    output$fivePR <- renderText({
-      oligos[2]
-    })
-    
-    #Print out the 3' forward oligo
-    output$threePF <- renderText({
-      oligos[3]
-    })
-    
-    #Print out the 3' reverse oligo
-    output$threePR <- renderText({
-      oligos[4]
-    })
+    printOutputs(oligos)
     
   })
   
@@ -286,7 +268,12 @@ shinyServer(function(input, output, session) {
                             toupper(input$crisprSeq), 
                             guideRNA, 
                             input$mh)
-    
+    printOutputs(oligos)
+
+  })
+
+  #Function to print the output
+  printOutputs <- function(oligos){
     #Print out the 5' forward oligo
     output$fivePF <- renderText({
       oligos[1]
@@ -306,8 +293,7 @@ shinyServer(function(input, output, session) {
     output$threePR <- renderText({
       oligos[4]
     })
-  })
-
+  }
   #getEnsemblSequence <- function(martName, dataSetType, geneId){
   #  ensembl <- useMart(martName, dataset = dataSetType)
   #  ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
@@ -365,7 +351,10 @@ shinyServer(function(input, output, session) {
     updateSliderInput(session, "mh", value = 24)
     updateRadioButtons(session, "paddingSelection", selected = 1)
     updateSelectInput(session, "padding", selected = 0)
-    
+    resetOutputs()
+  }
+  
+  resetOutputs <- function(){
     #Clear the 5' forward oligo output
     output$fivePF <- renderText({
       ""
@@ -383,4 +372,5 @@ shinyServer(function(input, output, session) {
       ""
     })
   }
+  
 })
