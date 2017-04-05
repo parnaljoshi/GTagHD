@@ -178,7 +178,34 @@ shinyServer(function(input, output, session) {
   })
   
   #Validate GeneID
-  
+  validGeneId <- reactive({
+    if(input$geneId != ""){
+      if((substr(input$geneId, 1, 3) == "ENS") || (substr(input$geneId, 1, 2) == "FB")){
+        if(input$species == 0){
+          validate(
+            need(substr(toupper(input$geneId), 1, 4) == "ENSG", 
+                 "Error: This gene ID does not correspond to a human gene. Please check the species.")
+          )
+        } else if(input$species == 1){
+          validate(
+            need(substr(toupper(input$geneId), 1, 7) == "ENSDARG", 
+                 "Error: This gene ID does not correspond to a zebrafish gene. Please check the species.")
+          )
+        } else if(input$species == 2){
+          validate(
+            need(substr(toupper(input$geneId), 1, 2) == "FBGN", 
+                 "Error: This gene ID does not correspond to a drosophila melanogaster gene. Please check the species.")
+          )
+        }
+      } else {
+        validate(
+          need((substr(toupper(input$geneId), 1, 3) == "ENS") || (substr(input$geneId, 1, 2) == "FB"), 
+               "Error: Gene ID is not an ENSEMBL gene ID. Please check gene ID input.")
+        )
+      }
+      
+    } 
+  })
   
   ########################################################
   ##############PRINT VALIDATION RESULTS##################
@@ -204,6 +231,9 @@ shinyServer(function(input, output, session) {
     validMH()
   })
   
+  output$validgeneid <- renderText({
+    validGeneId()
+  })
   #Print out the results of gene ID validation
   
   ########################################################
