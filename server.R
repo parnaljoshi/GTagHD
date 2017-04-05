@@ -288,34 +288,39 @@ shinyServer(function(input, output, session) {
     } 
   })
   
-
-  
-  
-  
 #Get cDNA/coding sequence from ENSEMBL
 observeEvent(input$geneIdSubmit, {
   resetOutputs()
-  dset <- if(input$species == 0){
-    "hsapiens_gene_ensembl"
-  } else if(input$species == 1){
-    "drerio_gene_ensembl"
-  } else if(input$species == 2){
-    "dmelanogaster_gene_ensembl"
-  }
   
-  if(input$gRNAtype == 1){
-    guideRNA <- ""
-  } else {
-    guideRNA <- toupper(input$gRNA)
+  if(is.null(validgRNA) &&
+     is.null(validCrisprSeq) &&
+     is.null(validMH) &&
+     is.null(validGeneId)){
+    
+    dset <- if(input$species == 0){
+      "hsapiens_gene_ensembl"
+    } else if(input$species == 1){
+      "drerio_gene_ensembl"
+    } else if(input$species == 2){
+      "dmelanogaster_gene_ensembl"
+    }
+    
+    if(input$gRNAtype == 1){
+      guideRNA <- ""
+    } else {
+      guideRNA <- toupper(input$gRNA)
+    }
+    
+    oligos <- getEnsemblSeq(dset,
+                            input$geneId, 
+                            toupper(input$crisprSeq), 
+                            guideRNA, 
+                            input$mh)
+    printOutputs(oligos)
   }
-  
-  oligos <- getEnsemblSeq(dset,
-                          input$geneId, 
-                          toupper(input$crisprSeq), 
-                          guideRNA, 
-                          input$mh)
-  printOutputs(oligos)
+
 })
+
   #Function to print the output
   printOutputs <- function(oligos){
     #Print out the 5' forward oligo
@@ -338,13 +343,6 @@ observeEvent(input$geneIdSubmit, {
       oligos[4]
     })
   }
-  #getEnsemblSequence <- function(martName, dataSetType, geneId){
-  #  ensembl <- useMart(martName, dataset = dataSetType)
-  #  ensCoords <- biomaRt:::getBM(attributes = c("ensembl_gene_id", "chromosome_name", "start_position", "end_position"), filters = "ensembl_gene_id", values = geneId, mart = ensembl)
-  #  ensSeq <- getSequence(type = "ensembl_gene_id", chromosome = ensCoords[1,2], start = ensCoords[1,3], end = ensCoords[1,4],  seqType = "cdna", mart = ensembl)
-    
-  #  seq <- biomaRt:::getSequence(id="ENSG00000146648", type = "ensembl_gene_id", seqType = "coding", mart = ensembl)
-  #}
   
   ########################################################
   #####################SIDEBAR STUFF######################

@@ -18,6 +18,7 @@ shinyUI(
              tags$div("MMEJ Tool (Better Name Suggestions Welcome)", 
                       style = "color:white"),
              
+             
     ########ABOUT#######################
     tabPanel(tags$div("About", style = "color:white"),
              titlePanel(""),
@@ -89,7 +90,6 @@ shinyUI(
              
              #Main panel for entering information and submitting job
              column(9, wellPanel(
-               
                
                ############Guide RNA selection section############################ 
                p(paste0("1. Select the guide RNA type. ",
