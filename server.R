@@ -177,6 +177,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  ######################Gene ID############################
   #Validate GeneID
   validGeneId <- reactive({
     if(input$geneId != ""){
@@ -231,10 +232,10 @@ shinyServer(function(input, output, session) {
     validMH()
   })
   
+  #Print out the results of gene ID validation
   output$validgeneid <- renderText({
     validGeneId()
   })
-  #Print out the results of gene ID validation
   
   ########################################################
   ################PERFORM CALCULATIONS####################
