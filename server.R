@@ -189,7 +189,7 @@ shinyServer(function(input, output, session) {
           need(getEnsemblSpecies(input$geneId) != -1, "Error: The gene ID is not recognized as an ENSEMBL gene ID.")
         )
       } else {
-        print(paste0(getEnsemblSpecies(input$geneId)[2], " ENSEMBL gene ID detected."))
+        paste0(getEnsemblSpecies(input$geneId)[2], " ENSEMBL gene ID detected.")
       }
       
     } 
