@@ -492,7 +492,7 @@ getEnsemblSpecies <- function(inGeneId){
         } else if(m3 == "XMA"){
           return(c("xmaculatus_gene_ensembl", "Xiphophorus maculatus (Platyfish)"))
         } else {
-          return(c("hsapiens_gene_ensembl", "Homo sapiens (Human"))
+          return(c("hsapiens_gene_ensembl", "Homo sapiens (Human)"))
         }
       }
     }
