@@ -184,29 +184,10 @@ shinyServer(function(input, output, session) {
   #Validate GeneID
   validGeneId <- reactive({
     if(input$geneId != ""){
-      if((substr(input$geneId, 1, 3) == "ENS") || (substr(input$geneId, 1, 2) == "FB")){
-        if(input$species == 0){
-          validate(
-            need(substr(toupper(input$geneId), 1, 4) == "ENSG", 
-                 "Error: This gene ID does not correspond to a human gene. Please check the species.")
-          )
-        } else if(input$species == 1){
-          validate(
-            need(substr(toupper(input$geneId), 1, 7) == "ENSDARG", 
-                 "Error: This gene ID does not correspond to a zebrafish gene. Please check the species.")
-          )
-        } else if(input$species == 2){
-          validate(
-            need(substr(toupper(input$geneId), 1, 2) == "FBGN", 
-                 "Error: This gene ID does not correspond to a drosophila melanogaster gene. Please check the species.")
-          )
-        }
-      } else {
-        validate(
-          need((substr(toupper(input$geneId), 1, 3) == "ENS") || (substr(input$geneId, 1, 2) == "FB"), 
-               "Error: Gene ID is not an ENSEMBL gene ID. Please check gene ID input.")
+      validate(
+        need(getEnsemblSpecies(input$geneId) != -1, "Error: The gene ID is not recognized as an ENSEMBL gene ID.")
         )
-      }
+      
       
     } 
   })
@@ -292,18 +273,19 @@ shinyServer(function(input, output, session) {
 observeEvent(input$geneIdSubmit, {
   resetOutputs()
   
-  if(is.null(validgRNA) &&
-     is.null(validCrisprSeq) &&
-     is.null(validMH) &&
-     is.null(validGeneId)){
+  if(is.null(validgRNA()) &&
+     is.null(validCrisprSeq()) &&
+     is.null(validMH()) &&
+     is.null(validGeneId())){
     
-    dset <- if(input$species == 0){
-      "hsapiens_gene_ensembl"
-    } else if(input$species == 1){
-      "drerio_gene_ensembl"
-    } else if(input$species == 2){
-      "dmelanogaster_gene_ensembl"
-    }
+    species <- getEnsemblSpecies(toupper(input$geneId))
+    #dset <- if(input$species == 0){
+    #  "hsapiens_gene_ensembl"
+    #} else if(input$species == 1){
+    #  "drerio_gene_ensembl"
+    #} else if(input$species == 2){
+    #  "dmelanogaster_gene_ensembl"
+    #}
     
     if(input$gRNAtype == 1){
       guideRNA <- ""
@@ -311,7 +293,7 @@ observeEvent(input$geneIdSubmit, {
       guideRNA <- toupper(input$gRNA)
     }
     
-    oligos <- getEnsemblSeq(dset,
+    oligos <- getEnsemblSeq(species[1],
                             input$geneId, 
                             toupper(input$crisprSeq), 
                             guideRNA, 
@@ -376,7 +358,7 @@ observeEvent(input$geneIdSubmit, {
     
     #Reset the inputs that will not be overwritten to their default values
     updateRadioButtons(session, "cDNAtype", selected = 1)
-    updateSelectInput(session, "species", selected = 0)
+    #updateSelectInput(session, "species", selected = 0)
     updateTextInput(session, "geneId", value = "ENSG00000146648")
     updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGCAGG")
   })
