@@ -352,7 +352,7 @@ getEnsemblSpecies <- function(inGeneId){
   if((substr(geneId, 1, 2) != "FB") && (substr(geneId, 1, 3) != "ENS")){
     return(-1)
   } else {
-    if(substr(geneId, 1, 2) == "FBGN"){
+    if(substr(geneId, 1, 4) == "FBGN"){
       return(c("dmelanogaster_gene_ensembl", "Drosophila melanogaster (Fruitfly)"))
     } else {
       if(substr(geneId, 4, 7) == "CSAV"){
