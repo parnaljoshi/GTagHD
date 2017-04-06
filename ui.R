@@ -135,17 +135,15 @@ shinyUI(
                #This panel displays if the user wants to use an ENSEMBL gene ID
                conditionalPanel(
                   condition = "input.cDNAtype == 1",
-                  
-                  
                   #Choose the species - required for bioMart
-                  p("Please select the species:"),
-                  selectInput("species", 
-                              label = "", 
-                              choices = list("Human" = 0, 
-                                             "Zebrafish" = 1,
-                                             "Fruitfly" = 2),
+                  #p("Please select the species:"),
+                  #selectInput("species", 
+                  #            label = "", 
+                  #            choices = list("Human" = 0, 
+                  #                           "Zebrafish" = 1,
+                  #                           "Fruitfly" = 2),
                                             # "Maize" = 3),
-                              selected = 0),
+                  #            selected = 0),
                   textOutput("validgeneid"),
                   textInput("geneId", 
                             label = "", 
