@@ -345,3 +345,156 @@ getEnsemblSeq <- function(dset, geneId, targetSeq, gRNA, mh){
   return(doCalculations(codingSeqTarget, targetSeq, gRNA, mh, padding))
 }
 
+#Match Ensembl Gene Id to species
+getEnsemblSpecies <- function(inGeneId){
+  geneId <- toupper(inGeneId)
+  
+  if((substr(geneId, 1, 2) != "FB") && (substr(geneId, 1, 3) != "ENS")){
+    return(-1)
+  } else {
+    if(substr(geneId, 1, 2) == "FBGN"){
+      return(c("dmelanogaster_gene_ensembl", "Drosophila melanogaster (Fruitfly)"))
+    } else {
+      if(substr(geneId, 4, 7) == "CSAV"){
+        return(c("csavignyi_gene_ensembl", "Ciona savignyi"))
+      } else {
+        m3 <- substr(geneId, 4, 6)
+        if(m3 == "AME"){
+          return(c("amelanoleuca_gene_ensembl", "Ailuropoda melanoleuca (Panda)"))
+        } else if(m3 == "APL"){
+          return(c("aplatyrhynchos_gene_ensembl", "Anas platyrhynchos (Duck)"))
+        } else if(m3 == "ACA"){
+          return(c("acarolinensis_gene_ensembl", "Anolis carolinensis (Anole lizard)"))
+        } else if(m3 == "AMX"){
+          return(c("amexicanus_gene_ensembl", "Astyanax mexicanus (Cave fish)"))
+        } else if(m3 == "BTA"){
+          return(c("btaurus_gene_ensembl", "Bos taurus (Cow)"))
+        } else if(m3 == "CEL"){
+          return(c("celegans_gene_ensembl", "Caenorhabditis elegans"))
+        } else if(m3 == "CJA"){
+          return(c("cjacchus_gene_ensembl", "Callithrix jacchus (Marmoset)"))
+        } else if(m3 == "CAF"){
+          return(c("cfamiliaris_gene_ensembl", "Canis lupus familiaris (Dog)"))
+        } else if(m3 == "CPO"){
+          return(c("cporcellus_gene_ensembl", "Cavia porcellus (Guinea Pig)"))
+        } else if(m3 == "CSA"){
+          return(c("csabaeus_gene_ensembl", "Chlorocebus sabaeus (Vervet-AGM)"))
+        } else if(m3 == "CHO"){
+          return(c("choffmanni_gene_ensembl", "Choloepus hoffmanni (Sloth)"))
+        } else if(m3 == "CIN"){
+          return(c("cintestinalis_gene_ensembl", "Ciona intestinalis"))
+        } else if(m3 == "DAR"){
+          return(c("drerio_gene_ensembl", "Danio rerio (Zebrafish)"))
+        } else if(m3 == "DNO"){
+          return(c("dnovemcinctus_gene_ensembl", "Dasypus novemcinctus (Armadillo)"))
+        } else if(m3 == "DOR"){
+          return(c("dordii_gene_ensembl", "Dipodomys ordii (Kangaroo rat)"))
+        } else if(m3 == "ETE"){
+          return(c("etelfairi_gene_ensembl", "Echinops telfairi (Lesser hedgehog tenrec)"))
+        } else if(m3 == "ECA"){
+          return(c("ecaballus_gene_ensembl", "Equus caballus (Horse)"))
+        } else if(m3 == "EEU"){
+          return(c("eeuropaeus_gene_ensembl", "Erinaceus europaeus (Hedgehog)"))
+        } else if(m3 == "FCA"){
+          return(c("fcatus_gene_ensembl", "Felis catus (Cat)"))
+        } else if(m3 == "FAL"){
+          return(c("falbicollis_gene_ensembl", "Ficedula albicollis (Flycatcher)"))
+        } else if(m3 == "GMO"){
+          return(c("gmorhua_gene_ensembl", "Gadus morhua (Cod)"))
+        } else if(m3 == "GAL"){
+          return(c("ggallus_gene_ensembl", "Gallus gallus (Chicken)"))
+        } else if(m3 == "GAC"){
+          return(c("gaculeatus_gene_ensembl", "Gasterosteus aculeatus (Stickleback)"))
+        } else if(m3 == "GGO"){
+          return(c("ggorilla_gene_ensembl", "Gorilla gorilla gorilla (Gorilla)"))
+        } else if(m3 == "STO"){
+          return(c("itridecemlineatus_gene_ensembl", "Ictidomys tridecemlineatus (Squirrel)"))
+        } else if(m3 == "LAC"){
+          return(c("lchalumnae_gene_ensembl", "Latimeria chalumnae (Coelacanth)"))
+        } else if(m3 == "LOC"){
+          return(c("loculatus_gene_ensembl", "Lepisosteus oculatus (Spotted gar)"))
+        } else if(m3 == "LAF"){
+          return(c("lafricana_gene_ensembl", "Loxodonta africana (Elephant)"))
+        } else if(m3 == "MMU"){
+          return(c("mmulatta_gene_ensembl", "Macaca mulatta (Macaque)"))
+        } else if(m3 == "MEU"){
+          return(c("meugenii_gene_ensembl", "Macropus eugenii (Wallaby)"))
+        } else if(m3 == "MGA"){
+          return(c("mgallopavo_gene_ensembl", "Meleagris gallopavo (Turkey)"))
+        } else if(m3 == "MIC"){
+          return(c("mmurinus_gene_ensembl", "Microcebus murinus (Mouse Lemur)"))
+        } else if(m3 == "MOD"){
+          return(c("mdomestica_gene_ensembl", "Monodelphis domestica (Opossum)"))
+        } else if(m3 == "MUS"){
+          return(c("mmusculus_gene_ensembl", "Mus musculus (Mouse)"))
+        } else if(m3 == "MPU"){
+          return(c("mfuro_gene_ensembl", "Mustela putorius furo (Ferret)"))
+        } else if(m3 == "MLU"){
+          return(c("mlucifugus_gene_ensembl", "Myotis lucifugus (Microbat)"))
+        } else if(m3 == "NLE"){
+          return(c("nleucogenys_gene_ensembl", "Nomascus leucogenys (Gibbon)"))
+        } else if(m3 == "OPR"){
+          return(c("oprinceps_gene_ensembl", "Ochotona princeps (Pika)"))
+        } else if(m3 == "ONI"){
+          return(c("oniloticus_gene_ensembl", "Oreochromis niloticus (Tilapia)"))
+        } else if(m3 == "OAN"){
+          return(c("oanatinus_gene_ensembl", "Ornithorhynchus anatinus (Platypus)"))
+        } else if(m3 == "OCU"){
+          return(c("ocuniculus_gene_ensembl", "Oryctolagus cuniculus (Rabbit)"))
+        } else if(m3 == "ORL"){
+          return(c("olatipes_gene_ensembl", "Oryzias latipes (Medaka)"))
+        } else if(m3 == "OGA"){
+          return(c("ogarnettii_gene_ensembl", "Otolemur garnettii (Bushbaby)"))
+        } else if(m3 == "OAR"){
+          return(c("oaries_gene_ensembl", "Ovis aries (Sheep)"))
+        } else if(m3 == "PTR"){
+          return(c("ptroglodytes_gene_ensembl", "Pan troglodytes (Chimpanzee)"))
+        } else if(m3 == "PAN"){
+          return(c("panubis_gene_ensembl", "Papio anubis (Olive baboon)"))
+        } else if(m3 == "PSI"){
+          return(c("psinensis_gene_ensembl", "Pelodiscus sinensis (Chinese softshell turtle)"))
+        } else if(m3 == "PMA"){
+          return(c("pmarinus_gene_ensembl", "Petromyzon marinus (Lamprey)"))
+        } else if(m3 == "PFO"){
+          return(c("pformosa_gene_ensembl", "Poecilia formosa (Amazon molly)"))
+        } else if(m3 == "PPY"){
+          return(c("pabelii_gene_ensembl", "Pongo abelii (Orangutan)"))
+        } else if(m3 == "PCA"){
+          return(c("pcapensis_gene_ensembl", "Procavia capensis (Hyrax)"))
+        } else if(m3 == "PVA"){
+          return(c("pvampyrus_gene_ensembl", "Pteropus vampyrus (Megabat)"))
+        } else if(m3 == "RNO"){
+          return(c("rnorvegicus_gene_ensembl", "Rattus norvegicus (Rat)"))
+        } else if(m3 == "SCE"){
+          return(c("scerevisiae_gene_ensembl", "Saccharomyces cerevisiae (Yeast)"))
+        } else if(m3 == "SHA"){
+          return(c("sharrisii_gene_ensembl", "Sarcophilus harrisii (Tasmanian devil)"))
+        } else if(m3 == "SAR"){
+          return(c("saraneus_gene_ensembl", "Sorex araneus (Shrew)"))
+        } else if(m3 == "SSC"){
+          return(c("sscrofa_gene_ensembl", "Sus scrofa (Pig)"))
+        } else if(m3 == "TGU"){
+          return(c("tguttata_gene_ensembl", "Taeniopygia guttata (Zebra Finch)"))
+        } else if(m3 == "TRU"){
+          return(c("trubripes_gene_ensembl", "Takifugu rubripes (Fugu)"))
+        } else if(m3 == "TSY"){
+          return(c("tsyrichta_gene_ensembl", "Tarsius syrichta (Tarsier)"))
+        } else if(m3 == "TNI"){
+          return(c("tnigroviridis_gene_ensembl", "Tetraodon nigroviridis (Tetraodon)"))
+        } else if(m3 == "TBE"){
+          return(c("tbelangeri_gene_ensembl", "Tupaia belangeri (Tree Shrew)"))
+        } else if(m3 == "TTR"){
+          return(c("ttruncatus_gene_ensembl", "Tursiops truncatus (Dolphin)"))
+        } else if(m3 == "VPA"){
+          return(c("vpacos_gene_ensembl", "Vicugna pacos (Alpaca)"))
+        } else if(m3 == "XET"){
+          return(c("xtropicalis_gene_ensembl", "Xenopus tropicalis (Xenopus)"))
+        } else if(m3 == "XMA"){
+          return(c("xmaculatus_gene_ensembl", "Xiphophorus maculatus (Platyfish)"))
+        } else {
+          return(c("hsapiens_gene_ensembl", "Homo sapiens (Human"))
+        }
+      }
+    }
+  }
+}
