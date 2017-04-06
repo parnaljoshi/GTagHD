@@ -184,13 +184,11 @@ shinyServer(function(input, output, session) {
   #Validate GeneID
   validGeneId <- reactive({
     if(input$geneId != ""){
-      if(getEnsemblSpecies(input$geneId)[1] == -1){
+      
         validate(
           need(getEnsemblSpecies(input$geneId) != -1, "Error: The gene ID is not recognized as an ENSEMBL gene ID.")
         )
-      } else {
-        paste0(getEnsemblSpecies(input$geneId)[2], " ENSEMBL gene ID detected.")
-      }
+      
       
     } 
   })
@@ -221,7 +219,11 @@ shinyServer(function(input, output, session) {
   
   #Print out the results of gene ID validation
   output$validgeneid <- renderText({
-    validGeneId()
+    if(is.null(validGeneId())){
+      paste0(getEnsemblSpecies(input$geneId)[2], " ENSEMBL gene ID detected.")
+    } else {
+      validGeneId()
+    }
   })
   
   ########################################################
