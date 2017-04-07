@@ -7,10 +7,13 @@
 #    http://shiny.rstudio.com/
 #
 
+#Required packages
 library(shiny)
 library(stringr)
 library(plyr)
 library(biomaRt)
+
+#Required files
 source("functions.R")
 
 shinyServer(function(input, output, session) {
@@ -18,7 +21,7 @@ shinyServer(function(input, output, session) {
   ####################INPUT VALIDATION####################
   ########################################################
   
-  #################GUIDE RNA##############################
+        ###########GUIDE RNA##############################
   #Check to ensure that the guide RNA is properly formatted, actually a guide RNA, etc.
   
   validgRNA <- reactive({
@@ -31,10 +34,15 @@ shinyServer(function(input, output, session) {
                     "Allowed nucleotides are A, C, G, and T.")
         )
       )
+    } else if((input$gRNAtype == 2) && (input$gRNA == "")){
+      #Prevent app crashing on empty submit
+      validate(
+        need(input$gRNA != "", "")
+      )
     }
   })
   
-  #################CRISPR TARGET##########################
+        ###########CRISPR TARGET##########################
   #Ensure that CRISPR sequence is a DNA sequence, is 23 nts long, 
   #has a PAM sequence in either forward or reverse direction 
   
@@ -58,23 +66,23 @@ shinyServer(function(input, output, session) {
                 (substring(uCS, nchar(uCS) - 1, nchar(uCS)) == "CC") |
                 (substring(uCS, 1, 2) == "GG") | 
                 (substring(uCS, 1, 2) == "CC")),
-             "Error: CRISRP target sequence does not have an identifiable PAM sequence. Please check input sequence.")
+             "Error: CRISRPR target sequence does not have an identifiable PAM sequence. Please check input sequence.")
+      )
+    } else {
+      #Prevent crashing on empty submit
+      validate(
+        need(input$crisprSeq != "", "")
       )
     }
     
   })
   
-  #################cDNA###################################
+        ###########cDNA###################################
   #Test if cDNA sequence is valid - crispr only appears once in either forward or reverse, etc.
   
   validCDNA <- reactive({
-    
-    #Check if using the ENSEMBLE gene ID, which is not yet supported.
-    if(input$cDNAtype == 1){
-      "ENSEMBL gene ID is not yet supported. Please choose 'Pasted cDNA'."
-    
-    } else if(input$cDNAtype == 2){
-      
+    #Don't bother checking valid cDNA unless the CRISPR is also valid
+    if(is.null(validCrisprSeq())){
       #Once text has been input
       if(input$cDNA != ""){
         #Convert sequences to uppercase
@@ -111,34 +119,39 @@ shinyServer(function(input, output, session) {
             need(revCount == 0, paste0("Error: The CRISPR target sequence also appears ", 
                                        revCount, 
                                        " times on the opposite strand."))
-            )
+          )
         } else if (count == 0 && revCount == 0){
           validate(
             need(revCount == 1, paste0("Error: The CRISPR target sequence does not appear ", 
                                        "on the given DNA strand, or in its complement."))
-            )
+          )
         } else if (count == 0 && revCount > 1){
           validate(
             need(revCount == 1, paste0("Error: The CRISPR target sequence appears ", 
                                        revCount, 
                                        " times on the opposite (reverse complement) strand."))
-            )
-        } else if(count == 1 && revCount == 0){
-          "Target sequence appears once in the cDNA."
-        } else if(count == 0 && revCount == 1){
-          "Target sequence appears once in the reverse complement of the cDNA."
-        }
+          )
+        } 
+      } else {
+        #Prevents crashing when submitted while empty
+        validate(
+          need(input$cDNA != "", "")
+        )
       }
+    }
       
-    }})
+      
+    })
   
   ######################Microhomology######################
   #Test if microhomology is valid, and troubleshoot if not
-  
-  validMH <- reactive({
+  validMHGene <- reactive({
     
+  })
+  
+  validMHCDna <- reactive({
     if((input$crisprSeq != "") && (input$cDNA != "")){
-      if(is.null(input$crisprSeq) && (is.null(input$cDNA))){
+      if(is.null(validCrisprSeq()) && (is.null(validCDNA()))){
         uDNA <- toupper(input$cDNA)
         uCS <- toupper(input$crisprSeq)
         
@@ -175,8 +188,13 @@ shinyServer(function(input, output, session) {
           }
         )
         
+        }
       }
-      }
+  })
+  
+  validMH <- reactive({
+    
+    
       
   })
   
@@ -217,6 +235,13 @@ shinyServer(function(input, output, session) {
     validMH()
   })
   
+  output$validmhcdna <- renderText({
+    validMHCDna()
+  })
+  
+  output$validmh <- renderText({
+    validMH()
+  })
   #Print out the results of gene ID validation
   output$validgeneid <- renderText({
     if(is.null(validGeneId())){
