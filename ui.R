@@ -250,8 +250,22 @@ shinyUI(
                                     step = 1, 
                                     ticks = TRUE),
                         
-                        #Space to output microhomology validation resutls; output$validmh
-                        textOutput("validmh"), 
+                        #Conditionally output microhomology validation for gene ID
+                        conditionalPanel(
+                          condition = "input.cDNAtype == 1",
+                          #Space to output microhomology validation resutls; output$validmhgeneid
+                          textOutput("validmhgeneid")
+                        ),
+                        
+                        #Conditionally output microhomology validation for gene ID
+                        conditionalPanel(
+                          condition = "input.cDNAtype == 2",
+                          
+                          #Space to output microhomology validation resutls; output$validmhcdna
+                          textOutput("validmhcdna")
+                        ),
+                        
+                        
                         
                         
                         ############SUBMIT####################
@@ -260,6 +274,7 @@ shinyUI(
                         #If pasting cDNA ####
                         conditionalPanel(
                           condition = "input.cDNAtype == 1",
+                          p("After pushing the Submit button, please wait a few seconds for your results to appear."),
                           actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
                         ),
                         
