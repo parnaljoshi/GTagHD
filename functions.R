@@ -129,7 +129,7 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
     
   } else {
     threePrimeF <- paste0("aag", threePrimeFBase)
-    threePrimeR <- paste0(reverseComplement(threePrimeFBase), "ccg")
+    threePrimeR <- paste0("ccg", reverseComplement(threePrimeFBase))
   }
   
   return(c(threePrimeF, threePrimeR))
