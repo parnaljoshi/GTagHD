@@ -129,7 +129,7 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
     
   } else {
     threePrimeF <- paste0("aag", threePrimeFBase)
-    threePrimeR <- paste0(reverseComplement(threePrimeFBase), "ccg")
+    threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
   }
   
   return(c(threePrimeF, threePrimeR))
@@ -157,12 +157,16 @@ addNonHBP <- function(seq){
     n <- substr(seq, i, i)
     
     if((n == "A")|(n == "a")){
+      set.seed(21)
       newNuc <- sample(c("C", "G", "T"), 1)
     } else if ((n == "C")|(n == "c")){
+      set.seed(21)
       newNuc <- sample(c("A", "G", "T"), 1)
     } else if ((n == "G")|(n == "g")){
+      set.seed(21)
       newNuc <- sample(c("A", "C", "T"), 1)
     } else if ((n == "T")|(n == "t")){
+      set.seed(21)
       newNuc <- sample(c("A", "C", "G"), 1)
     } else {
       stop("Error: Unsupported nucleotide type present. Supported nucleotides are A, C, G, and T. Please check to ensure input is a DNA sequence.")
@@ -325,30 +329,72 @@ getPadding <- function(padding){
 getEnsemblSeq <- function(dset, geneId, targetSeq, gRNA, mh){
   #Create dataset with specified mart
   gMart <- useMart("ensembl", dataset = dset)
-  #Get the coding sequences corresponding to the given gene ID
-  seq <- biomaRt:::getSequence(id = geneId, type = "ensembl_gene_id", seqType = "coding", mart = gMart)
-  #Identify which coding sequences have the target
-  codingSeqTarget <- seq[1,grep(targetSeq, seq)]
   
-  #Identify how many times target occurs in coding sequence
-  targetLocation <- unlist(str_locate_all(codingSeqTarget, targetSeq))
+  seq <- "Sequence unavailable"
+  counter <- 0
   
-  #Determine the # of padding nucleotides needed to fix break
-  padding <- if(((targetLocation[1] - 1) %% 3) == 0){
-    0
-  } else if(((targetLocation[1] - 1) %% 3) == 1){
-    2
-  } else if(((targetLocation[1] - 1) %% 3) == 2){
-    1
+  while(seq == "Sequence unavailable" && counter < 5){
+    #Get the coding sequences corresponding to the given gene ID
+    seq <- biomaRt:::getSequence(id = geneId, type = "ensembl_gene_id", seqType = "coding", mart = gMart)
+    counter <- counter + 1
   }
   
-  return(doCalculations(codingSeqTarget, targetSeq, gRNA, mh, padding))
+  #Identify which target sequences have the target
+  codingSeqTarget <- seq[grep(targetSeq, seq), 1]
+  
+  #Identify if the target sequence is in the reverse complement
+  codingSeqRevComp <- seq[grep(reverseComplement(targetSeq), seq), 1]
+  
+  #If the target sequence is not found in either the forward or reverse direction
+  if((length(codingSeqTarget) == 0) && (length(codingSeqRevComp) == 0)){
+    return(c("Error: Target sequence is not present in ENSEMBL sequence.", "", "", ""))
+    
+    #If the target sequence appears more than once in the forward or reverse direction
+  } else if((length(codingSeqTarget) > 1) || (length(codingSeqRevComp) > 1)){
+    return(c("Error: Target sequence appears multiple times in ENSEMBL entry. Please enter a different target sequence.", "", "", ""))
+    
+    #If the target sequence appears more than once in the forward AND reverse direction.
+  } else if(length(codingSeqTarget) > 0 && length(codingSeqRevComp) > 0){
+    return(c("Error: Target sequence appears in the forward and reverse direction. Please enter a different target sequence.", "", "", ""))
+    
+  } else {
+    
+    #If the target sequence appears exactly once in forward direction
+    if(length(codingSeqTarget > 0)){
+      #Identify how many times target occurs in coding sequence
+      targetLocation <- unlist(str_locate_all(codingSeqTarget, targetSeq))
+      
+      #If the target sequence appears more than once in this coding sequence
+      if(length(targetLocation) > 2){
+        return(c("Error: Target sequence appears multiple times in ENSEMBL entry. Please enter a different target sequence.", "", "", ""))
+        
+        
+      } else {
+        
+        #Determine the # of padding nucleotides needed to fix break
+        padding <- if(((targetLocation[1] - 1) %% 3) == 0){
+          0
+        } else if(((targetLocation[1] - 1) %% 3) == 1){
+          2
+        } else if(((targetLocation[1] - 1) %% 3) == 2){
+          1
+        }
+        return(doCalculations(codingSeqTarget, targetSeq, gRNA, mh, padding))
+      }
+    } 
+  }
 }
+
 
 #Match Ensembl Gene Id to species
 getEnsemblSpecies <- function(inGeneId){
   geneId <- toupper(inGeneId)
-  
+  if(nchar(geneId) < 6){
+    return(-1)
+  }
+  if(!grepl("[0-9]+", geneId)){
+    return(-1)
+  }
   if((substr(geneId, 1, 2) != "FB") && (substr(geneId, 1, 3) != "ENS")){
     return(-1)
   } else {
@@ -496,5 +542,22 @@ getEnsemblSpecies <- function(inGeneId){
         }
       }
     }
+  }
+}
+
+
+pingGeneId <- function(id){
+  dset <- getEnsemblSpecies(id)
+  if(dset != -1){
+    gMart <- useMart("ensembl", dataset = dset[1])
+    dummy <- biomaRt:::getBM("description", filters = "ensembl_gene_id", values = id, mart = gMart)
+    
+    if(nrow(dummy) == 0){
+      return(FALSE)
+    } else {
+      return(TRUE)
+    }
+  } else {
+    return(FALSE)
   }
 }
