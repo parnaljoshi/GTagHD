@@ -7,7 +7,7 @@
 
 #Run first time you run this tool on a computer:
 
-install.packages(c("shiny", "shinyjs", "Rcpp", "plyr"))
+install.packages(c("shiny", "shinyjs", "Rcpp", "plyr", "stringr"))
 
 source("https://bioconductor.org/biocLite.R")
 
