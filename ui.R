@@ -12,47 +12,53 @@ library(shinyjs)
 
 shinyUI(
   
+  
   #Creates the navbar set-up
   navbarPage(id = 'mainPage',
+             windowTitle = "Epic Title Fight",
+             
              #Stylesheet
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("MMEJ Tool (Better Name Suggestions Welcome)", 
+             tags$div("Epic Title Fight v0.0.5", 
                       style = "color:white"),
-             
              
              ########ABOUT TAB#################################################
              tabPanel(tags$div("About", style = "color:white"),
                       titlePanel(""),
-                      sidebarLayout(
+                      
+                      #Sidebar panel with links
+                      column(2, wellPanel(
+                        tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isulogo.jpg",     width = "90%")))),
+                        p(""),
+                        tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "mayoclinic.jpeg", width = "50%"))))
+                      )),
+                      
+                      #Text area in center of page
+                      column(9, wellPanel(
+                      ))
+                      
+             ),
+             
+             ##########INSTRUCTIONS############################################
+             tabPanel(tags$div("Instructions", style = "color:white"),
+                      titlePanel(""),
+                      
+                      #Sidebar panel with links
+                      column(2, wellPanel(
+                        tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isulogo.jpg",     width = "90%")))),
+                        p(""),
+                        tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "mayoclinic.jpeg", width = "50%"))))
+                      )),
+                      
+                      #Text area in center of page
+                      column(9, wellPanel(
                         
-                        #Sidebar panel with links
-                        sidebarPanel(
-                          width = 2,
-                          tags$html(tags$div(tags$span("We can put links to", 
-                                                       a(href = "http://www.iastate.edu", "other"), 
-                                                       tags$a(href = "http://www.mayoclinic.org", "websites"), 
-                                                       "here.")),
-                                    tags$div(tags$span("Or ", 
-                                                       a(href = "examplepdf.pdf", "papers"), 
-                                                       ". Or anything, really.")))
-                        ),
-                        
-                        #Text area in center of page
-                        mainPanel(
-                          #ISU Logo
-                          tags$img(src = "isulogo.jpg",
-                                   height = "75px"), 
-                          p(""),
-                          #Mayo Clinic Logo
-                          tags$img(src = "mayoclinic.jpeg", 
-                                   height = "218px", 
-                                   width = "200px"),
-                          #Display page instructions
-                          includeHTML("www/instructions.html")
-                        )
-                      )
+                        #Display page instructions
+                        includeHTML("www/instructions.html")
+                      ))
+                      
              ),
              
              ##########SUBMIT SINGLE JOB TAB###################################
@@ -86,6 +92,34 @@ shinyUI(
                       #Main panel for entering information and submitting job
                       column(9, wellPanel(
                         
+                        ############Plasmid selection section##############################
+                        #Plasmid Instructions
+                        #p(paste0("0. Do you want to use a pGTag Series plasmid?")),
+                        #radioButtons("plasmidCond",
+                        #             label = "",
+                        #             choices = list("Yes" = 1,
+                        #                            "No"  = 0),
+                        #             selected = 0),
+                        #
+                        #conditionalPanel(condition = "input.plasmidCond == '1'",
+                        #                 selectInput("plasmidType",
+                        #                             label = "",
+                        #                             choices = list("None" = 0,
+                        #                                            "pGTag-eGFP-B-actin_(062917)" = 1,
+                        #                                            "pGTag-eGFP-caax-B-actin_(062917)" = 2,
+                        #                                            "pGTag-eGFP-caax-SV40_(062917)" = 3,
+                        #                                            "pGTag-eGFP-SV40_(062917)" = 4,
+                        #                                            "pGTag-Gal4-VP16-B-actin_(062917)" = 5,
+                        #                                            "pGTag-NLS-eGFP-B-actin_(062917)" = 6,
+                        #                                            "pGTag-NLS-eGFP-SV40_(062917)" = 7,
+                        #                                            "pGTag-NLS-TagRFP-B-actin_(062917)" = 8,
+                        #                                            "pGTag-NLS-TagRFP-SV40_(062917)" = 9,
+                        #                                            "pGTag-TagRFP-B-actin_(062917)" = 10,
+                        #                                            "pGTag-TagRFP-caax-B-actin_(062917)" = 11,
+                        #                                            "pGTag-TagRFP-caax-SV40_(062917)" = 12,
+                        #                                            "pGTag-TagRFP-SV40_(062917)" = 13))
+                        #                 
+                        #),
                         ############Guide RNA selection section############################ 
                         #Guide RNA instructions
                         p(paste0("1. Select the guide RNA type. ",
@@ -95,8 +129,8 @@ shinyUI(
                         #Buttons to select input$gRNAtype
                         radioButtons("gRNAtype", 
                                      label = "", 
-                                     choices = list("universal guide RNA" = 1, 
-                                                    "custom guide RNA" = 2), 
+                                     choices = list("Universal Guide RNA (for use with pGTag Series plasmids)" = 1, 
+                                                    "Custom Guide RNA" = 2), 
                                      selected = 1),
                         
                         #This panel displays if the user wants to put in a custom guide RNA
@@ -172,83 +206,35 @@ shinyUI(
                                         rows = 6),
                           
                           #Padding Selection ################
-                          #Padding instructions
-                          p(paste0("Do you want to attempt to automatically generate the ", 
-                                   "'padding' nucleotides to repair potential codon breaks?")),
-                          
-                          #Padding option selection; input$paddingSelection
-                          radioButtons("paddingSelection", 
-                                       label="", 
-                                       choices = list("No" = 1, 
-                                                      "Yes" = 2), 
-                                       selected = 1),
-                          
-                          ###Auto Padding ###################
-                          #This panel displays if the user wants to try to automatically generate padding codons
-                          conditionalPanel(
-                            
-                            condition = "input.paddingSelection == 2",
-                            
-                            #Instructions for BLAST
-                            p("Specify parameters for BLAST search:"),
-                            p("How many hits to display (default is up to 5):"),
-                            
-                            #Numeric drop-down to select the number of hits; input$hitNumber
-                            numericInput("hitNumber", 
-                                         label="", 
-                                         value = 5, 
-                                         min = 1, 
-                                         max = 20, 
-                                         step = 1),
-                            
-                            #E-value instructions
-                            p(paste0("E-Value cutoff power; only hits better than this ", 
-                                     "value will be displayed (default is 3, which corresponds to 1E-03):")),
-                            
-                            #Numeric drop-down to select the e-value cutoff; input$eCutoff
-                            numericInput("eCutoff", 
-                                         label="", 
-                                         value = 3, 
-                                         min = 1, 
-                                         step = 1),
-                            
-                            #BLAST submission; input$blastSubmit
-                            actionButton("blastSubmit", label = "Submit BLAST")
-                          ),
-                          
-                          ###Manual Padding ###############
                           #This panel displays if the user knows how many padding nucleotides to put in
-                          conditionalPanel(
-                            condition = "input.paddingSelection == 1",
-                            
-                            #Instructions
-                            p("Please select the number of 'padding' nucleotides to repair codon changes."),
-                            
-                            #Selection drop-down box; input$padding
-                            selectInput("padding", 
-                                        label = "", 
-                                        choices = list("0" = 0, 
-                                                       "1" = 1, 
-                                                       "2" = 2), 
-                                        selected = "", 
-                                        width = '100px')
-                          )
+                          #Instructions
+                          p("Please select the number of 'padding' nucleotides to repair codon changes."),
+                          
+                          #Selection drop-down box; input$padding
+                          selectInput("padding", 
+                                      label = "", 
+                                      choices = list("0" = 0, 
+                                                     "1" = 1, 
+                                                     "2" = 2), 
+                                      selected = "", 
+                                      width = '100px')
                         ),
+                        
                         
                         
                         ############Microhomology Selection section########################
                         #Determine the length of microhomology
                         #Instructions
-                        p("4. Select the length of microhomology you wish to use (recommended value = 24):"),
+                        p("4. Select the length of microhomology you wish to use (recommended value = 48):"),
                         
                         #Slider bar to select mh length; input$mh
-                        sliderInput("mh", 
+                        selectInput("mh", 
                                     label = "", 
-                                    value = 24, 
-                                    min = 12, 
-                                    max = 48, 
-                                    step = 1, 
-                                    ticks = TRUE),
+                                    choices = c("12" = 12, 
+                                                   "24" = 24, 
+                                                   "48" = 48),
+                                    selected = 48,
+                                    width = '100px'),
                         
                         #Conditionally output microhomology validation for gene ID
                         conditionalPanel(
@@ -264,8 +250,7 @@ shinyUI(
                           #Space to output microhomology validation resutls; output$validmhcdna
                           textOutput("validmhcdna")
                         ),
-                        
-                        
+
                         
                         
                         ############SUBMIT####################
@@ -281,6 +266,7 @@ shinyUI(
                         #If using gene ID ####
                         conditionalPanel(
                           condition = "input.cDNAtype == 2",
+                          textOutput("geneProg"),
                           actionButton("submit", label = "Submit")
                         ),
                         
@@ -290,10 +276,10 @@ shinyUI(
                         p(""),
                         
                         
-                        #Output
+                        ####Output####
                         p(""),
                         p(""),
-                        p("5' forward oligo:"),
+                        p("5' forward oligo: "),
                         textOutput("fivePF"),
                         p(""),
                         p(""),
@@ -306,39 +292,144 @@ shinyUI(
                         p(""),
                         p(""),
                         p("3' reverse oligo:"),
-                        textOutput("threePR")
+                        textOutput("threePR"),
                         
+                        p(""),
+                        p(""),
+                        
+                        uiOutput("downOut")
                       )
                       )
              ),
              
              
-             ##########SUMBIT MULTIPLE JOBS Tab################################
-             tabPanel(tags$div("Submit Several Jobs", style = "color:white"),
-                      titlePanel(""),
-                      p("We could do this, but it might be better to have people use offline version instead...")
-                      
-             ),
              
              ##########HOW TO CITE Tab#########################################
              tabPanel(
                tags$div("How to Cite", style = "color:white"),
                titlePanel(""),
-               p("When the paper is published, citation goes here...")
+               #Sidebar panel with links
+               column(2, wellPanel(
+                 p("Paper link here?")
+               )),
+               
+               #Text area in center of page
+               column(9, wellPanel(
+                 p("When the paper is published, citation goes here...")
+               ))
+               
              ),
              
              ##########CONTACT US Tab##########################################
              tabPanel(
                tags$div("Contact", style = "color:white"),
                titlePanel(""),
-               p("We can put links to lab websites or Genome Engineering stuff here.")
+               #Sidebar panel with links
+               column(2, wellPanel(
+                 p("Lab website links here.")
+               )),
+               
+               #Text area in center of page
+               column(9, wellPanel(
+                 p("Please contact <epictitlefightsupport@iastate.edu> to report issues and request support."),
+                 p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/mmejWebTool", target = "_blank", " GitHub."), " The R code is provided as-is under <license>. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
+               ))
+               
+             ),
+             ##########TOOLS AND DOWNLOADS TAB#################################
+             
+             tabPanel(
+               tags$div("Tools and Downloads", style = "color:white"),
+               titlePanel(""),
+               #Sidebar panel with links
+               column(2, wellPanel(
+                 p(tags$a(href = "https://github.com/Dobbs-Lab/mmejWebTool", target = "_blank", "Download Epic Title Fight at GitHub"))
+               )),
+               
+               #Text area in center of page
+               column(9, wellPanel(
+                 #p("Download standalone version, or other stuff."),
+                 
+                 h1("Download G-Series Plasmid Sequences"),
+                 
+                 p(tags$a(href     = 'plasmids/allplasmids.zip', 
+                          target   = 'blank', 
+                          'Download all plasmids', 
+                          download = '062917_gseries_plasmids.zip')),
+                 p(tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).ape',
+                          target   = 'blank', 
+                          "pGTag-eGFP-B-actin_(062917)", 
+                          download = "pGTag-eGFP-B-actin_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-eGFP-caax-B-actin_(062917)", 
+                          download = "pGTag-eGFP-caax-B-actin_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-eGFP-caax-SV40_(062917)", 
+                          download = "pGTag-eGFP-caax-SV40_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-eGFP-B-actin_(062917)", 
+                          download = "pGTag-eGFP-B-actin_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-Gal4-VP16-B-actin_(062917)", 
+                          download = "pGTag-Gal4-VP16-B-actin_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-NLS-eGFP-B-actin_(062917)", 
+                          download = "pGTag-NLS-eGFP-B-actin_(062917)).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-NLS-eGFP-SV40_(062917)", 
+                          download = "pGTag-NLS-eGFP-SV40_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-NLS-TagRFP-B-actin_(062917)", 
+                          download = "pGTag-NLS-TagRFP-B-actin_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-NLS-TagRFP-SV40_(062917)", 
+                          download = "pGTag-NLS-TagRFP-SV40_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-TagRFP-B-actin_(062917)", 
+                          download = "pGTag-TagRFP-B-actin_(062917).ape")),
+                 p(tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).ape', 
+                          target = 'blank', 
+                          "pGTag-TagRFP-caax-B-actin_(062917)", 
+                          download = "pGTag-TagRFP-caax-B-actin_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-TagRFP-caax-SV40_(062917)", 
+                          download = "pGTag-TagRFP-caax-SV40_(062917).ape")),
+                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).ape', 
+                          target   = 'blank', 
+                          "pGTag-TagRFP-SV40_(062917)", 
+                          download = "pGTag-TagRFP-SV40_(062917).ape"))
+               ))
+               
              ),
              
              ##########FUNDING Tab#############################################
              tabPanel(
                tags$div("Funding", style = "color:white"),
                titlePanel(""),
-               p("R24 Grant Stuff Here!")
+               #Sidebar panel with links
+               column(2, wellPanel(
+                 tags$html(tags$div(tags$span(a(href = "https://www.iastate.edu/", target = "_blank", "Iowa State University"))),
+                           tags$div(tags$span(a(href = "https://www.mayoclinic.org/", target = "_blank", "The Mayo Clinic"))),
+                           tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", target = "_blank", "Genome Writers Guild"))),
+                           tags$div(tags$span(a(href = "https://dill-picl.org", target = "_blank", "Dill-PICL Lab"))),
+                           tags$div(tags$span(a(href = "https://www.nih.gov/", target = "_blank", "National Institutes of Health (NIH)")))
+                 ))),
+               
+               #Text area in center of page
+               column(9, wellPanel(
+                 tags$p("This project was funded through NIH R24 OD020166 and is a joint effort by Iowa State University and The Mayo Clinic."),
+                 tags$p("This server is generously hosted by the", a(href = "https://dill-picl.org/", target = "_blank", 'Dill-PICL Lab'), "at Iowa State University.")
+               ))
              ),
              
              
@@ -346,9 +437,20 @@ shinyUI(
              tabPanel(
                tags$div("Change Log", style = "color:white"),
                titlePanel(""),
-               includeHTML("www/changelog.html")
+               
+               column(2, wellPanel(
+                 tags$html(tags$div(tags$span(a(href = "https://www.iastate.edu/", target = "_blank", "Iowa State University"))),
+                           tags$div(tags$span(a(href = "https://www.mayoclinic.org/", target = "_blank", "The Mayo Clinic"))),
+                           tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", target = "_blank", "Genome Writers Guild"))),
+                           tags$div(tags$span(a(href = "https://dill-picl.org", target = "_blank", "Dill-PICL Lab"))),
+                           tags$div(tags$span(a(href = "https://www.nih.gov/", target = "_blank", "National Institutes of Health (NIH)")))
+                 ))),
+               
+               #Text area in center of page
+               column(9, wellPanel(
+                 includeHTML("www/changelog.html")
+               ))
              )
-             
   ))
 #
 
