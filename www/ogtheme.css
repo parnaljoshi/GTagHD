@@ -8,8 +8,14 @@ body,
 .navbar-static-top {
   position: static;
   margin-bottom: 0px;
-  background-color: #a0181a !important;
+  background-color: #C8102E !important;
   
+}
+
+.tab-above > .nav  > li[class=active] > a {background-color: #F1BE48; color: black}
+
+.navbar-default.navbar-brand{
+	color: #F1BE48 !important
 }
 
 .shiny-output-error-validation {
