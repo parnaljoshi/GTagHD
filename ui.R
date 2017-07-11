@@ -331,8 +331,8 @@ shinyUI(
                
                #Text area in center of page
                column(9, wellPanel(
-                 p("Please contact <epictitlefightsupport@iastate.edu> to report issues and request support."),
-                 p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/mmejWebTool", target = "_blank", " GitHub."), " The R code is provided as-is under <license>. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
+                 p("Please contact GTagHDHelp@iastate.edu to report issues and request support."),
+                 p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
                ))
                
              ),
