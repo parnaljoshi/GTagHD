@@ -1,6 +1,6 @@
-# mmejWebTool
+# GTagHD
 
-#A repository for the MMEJ Web Tool
+#A repository for the GTagHD Web Tool
 
 #You can run this shiny web app in RStudio (or R) by opening up an R or RStudio session, and running the following code:
 
@@ -19,7 +19,7 @@ biocLite("biomaRt")
 
 library(shiny)
 
-runGitHub("mmejWebTool", "Dobbs-Lab")
+runGitHub("GTagHD", "Dobbs-Lab")
 
 
 #You're all set!
