@@ -15,13 +15,13 @@ shinyUI(
   
   #Creates the navbar set-up
   navbarPage(id = 'mainPage',
-             windowTitle = "Epic Title Fight",
+             windowTitle = "GTagHD",
              
              #Stylesheet
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("Epic Title Fight v0.0.5", 
+             tags$div("GTagHD v1.0.1", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
@@ -343,7 +343,7 @@ shinyUI(
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
-                 p(tags$a(href = "https://github.com/Dobbs-Lab/mmejWebTool", target = "_blank", "Download Epic Title Fight at GitHub"))
+                 p(tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", "Download GTagHD at GitHub"))
                )),
                
                #Text area in center of page
