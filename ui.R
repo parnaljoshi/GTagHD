@@ -164,13 +164,17 @@ shinyUI(
                         
                         ###########cDNA/Gene ID Section####################################
                         #Gene ID/cDNA instructions
-                        p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
+                        #p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
+                        #         "the box in PLAIN TEXT format (no FASTA header).")),
+                        
+                        p(paste0("3. Paste a cDNA sequence into ", 
                                  "the box in PLAIN TEXT format (no FASTA header).")),
+                        p("ENSEMBL gene ID support coming soon."),
                         
                         #Buttons to choose cDNAtype; input$cDNAtype
                         radioButtons("cDNAtype", 
                                      label = "", 
-                                     choices = list("ENSEMBL gene ID" = 1, 
+                                     choices = list(#"ENSEMBL gene ID" = 1, 
                                                     "Pasted cDNA" = 2), 
                                      selected = 2),
                         
