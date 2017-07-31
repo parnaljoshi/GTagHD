@@ -42,7 +42,7 @@ shinyUI(
              ),
              
              ##########INSTRUCTIONS############################################
-             tabPanel(tags$div("Instructions", style = "color:white"),
+             tabPanel(tags$div("Instructions and FAQs", style = "color:white"),
                       titlePanel(""),
                       
                       #Sidebar panel with links
@@ -175,7 +175,7 @@ shinyUI(
                         radioButtons("cDNAtype", 
                                      label = "", 
                                      choices = list(#"ENSEMBL gene ID" = 1, 
-                                                    "Pasted cDNA" = 2), 
+                                       "Pasted cDNA" = 2), 
                                      selected = 2),
                         
                         #####cDNAtype == GENE ID#####
@@ -235,8 +235,8 @@ shinyUI(
                         selectInput("mh", 
                                     label = "", 
                                     choices = c("12" = 12, 
-                                                   "24" = 24, 
-                                                   "48" = 48),
+                                                "24" = 24, 
+                                                "48" = 48),
                                     selected = 48,
                                     width = '100px'),
                         
@@ -254,7 +254,7 @@ shinyUI(
                           #Space to output microhomology validation resutls; output$validmhcdna
                           textOutput("validmhcdna")
                         ),
-
+                        
                         
                         
                         ############SUBMIT####################
@@ -335,7 +335,7 @@ shinyUI(
                
                #Text area in center of page
                column(9, wellPanel(
-                 p("Please contact GTagHDHelp@iastate.edu to report issues and request support."),
+                 p("Please contact GTagHDHelp@gmail.com to report issues and request support."),
                  p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
                ))
                
