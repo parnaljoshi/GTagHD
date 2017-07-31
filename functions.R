@@ -18,13 +18,22 @@
 #' @examples
 #'
 
-doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding){
+doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag){
   #' Determine the location of the CRISPR cut site in the cDNA sequence:
   cutSite <- getGenomicCutSite(toupper(dnaSeq), toupper(crisprSeq))
-  #' Calculate the 5' oligo targeting domains
-  fiveData <- get5Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
-  #' Calculate the 3' oligo targeting domains
-  threeData <- get3Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite)
+  #' Construct oligos correctly if reverse flag has been applied
+  if(revFlag == FALSE){
+    #' Calculate the 5' oligo targeting domains
+    fiveData <- get5Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
+    #' Calculate the 3' oligo targeting domains
+    threeData <- get3Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite)
+  } else {
+    #' Calculate the 5' oligo targeting domains
+    fiveData <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite)
+    #' Calculate the 3' oligo targeting domains
+    threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
+  }
+
   return(c(fiveData, threeData))
 }
 
@@ -99,6 +108,50 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding){
   return(c(fivePrimeF, fivePrimeR))
 }
 
+get5PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
+  homology <- substring(dnaSeq, cutSite + 1, cutSite + mh)
+  spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
+  nhSpacer <- addNonHBP(spacer)
+  
+  threePrimeFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
+  
+  #Add cloning sites if needed
+  if(nchar(passSeq) > 0){
+    threePrimeF <- paste0("aattc", reverseComplement(threePrimeFBase), "c")
+    threePrimeR <- paste0("ggatc", threePrimeFBase, "c")
+    
+  } else {
+    threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
+    threePrimeR <- paste0("cgg", threePrimeFBase)
+    
+  }
+  
+  return(c(threePrimeF, threePrimeR))
+
+}
+
+get3PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding){
+  #Get the homologous section from the genome
+  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
+  #Get the next three nucleotides
+  spacer   <- substring(toupper(dnaSeq), cutSite - (mh + 2), cutSite - mh)
+  #Generate a three nucleotide-long spacer that is not homologous to spacer
+  nhSpacer <- addNonHBP(spacer)
+  
+  #Create the base five prime oligo
+  fivePrimeFBase <- paste0(gRNA, nhSpacer, homology, getPadding(padding))
+  
+  #If a custom guide RNA is used, add restriction enzyme sites
+  if(nchar(gRNA) > 0){
+    fivePrimeF <- paste0("catgg", reverseComplement(fivePrimeFBase), "g")
+    fivePrimeR <- paste0("ggccg", fivePrimeFBase, "g")
+  } else {
+    fivePrimeF <- paste0("gcgg", reverseComplement(fivePrimeFBase))
+    fivePrimeR <- paste0("atcc", fivePrimeFBase)
+  }
+  
+  return(c(fivePrimeF, fivePrimeR))
+}
 #' get3Prime
 #'
 #' This function takes user inputs and formats them into the 3' forward and reverse targeting oligos for microhomology-mediated end joining

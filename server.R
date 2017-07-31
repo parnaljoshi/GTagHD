@@ -14,7 +14,6 @@ library(stringr)
 library(plyr)
 library(biomaRt)
 
-
 #Required files
 source("functions.R")
 
@@ -254,7 +253,7 @@ shinyServer(function(input, output, session) {
     if(is.null(validgRNA()) &&
        is.null(validCrisprSeq()) &&
        is.null(validCDNA())){
-      
+      revFlag <- FALSE
       resetOutputs()
       #Convert inputs to uppercase
       if(input$gRNAtype == 1){
@@ -275,8 +274,10 @@ shinyServer(function(input, output, session) {
       #Checks to see if using reverseComplement of cDNA
       if(revCount == 1 && count == 0){
         uDNA <- reverseComplement(input$cDNA)
+        revFlag <- TRUE
       } else {
         uDNA <- input$cDNA
+        revFlag <- FALSE
       }
       
       #Create the oligos
@@ -284,7 +285,8 @@ shinyServer(function(input, output, session) {
                                toupper(input$crisprSeq), 
                                guideRNA, 
                                as.numeric(input$mh),  
-                               input$padding)
+                               input$padding,
+                               revFlag)
       dF$downloadF <<-TRUE
       printOutputs(oligos)
     } 
