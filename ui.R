@@ -21,7 +21,7 @@ shinyUI(
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("GTagHD v1.0.1", 
+             tags$div("GTagHD v1.0.3", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
@@ -77,10 +77,10 @@ shinyUI(
                         p(""),
                         
                         #ENSEMBL gene ID example; input$exampleEnsembl
-                        actionLink("exampleEnsembl", 
-                                   label = "Example For ENSEMBL Function"),
+                        #actionLink("exampleEnsembl", 
+                        #           label = "Example For ENSEMBL Function"),
                         
-                        p(""),
+                        #p(""),
                         
                         #Reset Button; input$reset
                         actionLink("reset", 
@@ -314,12 +314,12 @@ shinyUI(
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
-                 p("Paper link here?")
+                 p("Paper link will be here when it's published.")
                )),
                
                #Text area in center of page
                column(9, wellPanel(
-                 p("When the paper is published, citation goes here...")
+                 p("Manuscript is in prep; citation will be available shortly.")
                ))
                
              ),
@@ -330,7 +330,7 @@ shinyUI(
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
-                 p("Lab website links here.")
+                 #p("Lab website links here.")
                )),
                
                #Text area in center of page
