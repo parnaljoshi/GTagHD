@@ -356,7 +356,7 @@ shinyUI(
                  
                  h1("Download G-Series Plasmid Sequences"),
                  
-                 p(tags$a(href     = 'plasmids/allplasmids.zip', 
+                 p(tags$a(href     = 'plasmids/062917_gseries_plasmids.zip', 
                           target   = 'blank', 
                           'Download all plasmids', 
                           download = '062917_gseries_plasmids.zip')),
