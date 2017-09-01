@@ -12,7 +12,8 @@ library(shiny)
 library(shinyjs)
 library(stringr)
 library(plyr)
-library(biomaRt)
+#library(biomaRt)
+library(rentrez)
 
 #Required files
 source("functions.R")
@@ -148,6 +149,20 @@ shinyServer(function(input, output, session) {
       
     })
   
+  #Function to validate the input GenBank ID
+  validGenbankId <- reactive({
+    tryCatch({
+      gbFile = entrez_fetch("nucleotide", input$genbankId, rettype = "gb")
+    }, error = function(err){
+      validate(
+        need(1 == 2, "Error: That GenBank ID does not exist.")
+      )
+    })
+    if(length(gbFile) > 0){
+      ""
+    }
+  })
+  
   ######################Microhomology######################
   #Test if microhomology is valid, and troubleshoot if not
   validMHCDna <- reactive({
@@ -232,6 +247,9 @@ shinyServer(function(input, output, session) {
     validMHCDna()
   })
   
+  output$validgenbankid <- renderText({
+    validGenbankId()
+  })
 
   #Print out the results of gene ID validation
   output$validgeneid <- renderText({
