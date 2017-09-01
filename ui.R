@@ -174,14 +174,29 @@ shinyUI(
                         #Buttons to choose cDNAtype; input$cDNAtype
                         radioButtons("cDNAtype", 
                                      label = "", 
-                                     choices = list(#"ENSEMBL gene ID" = 1, 
-                                       "Pasted cDNA" = 2), 
+                                     choices = list("GenBank Gene ID" = 1,
+                                                    #"ENSEMBL Gene ID" = 3,
+                                                    "Pasted cDNA" = 2), 
                                      selected = 2),
+                        
+                        #####cDNAtype == GENBANK ID####
+                        conditionalPanel(
+                          condition = "input.cDNAtype == 1",
+                          
+                          #Space to output validated gene ID; output$validgeneid
+                          textOutput("validgenbankid"),
+                          
+                          #Box to paste gene ID; input$geneId
+                          textInput("genbankId", 
+                                    label = "", 
+                                    value = "", 
+                                    placeholder = "Paste GenBank nucleotide gene accession here...")
+                        ),
                         
                         #####cDNAtype == GENE ID#####
                         #This panel displays if the user wants to use an ENSEMBL gene ID
                         conditionalPanel(
-                          condition = "input.cDNAtype == 1",
+                          condition = "input.cDNAtype == 3",
                           
                           #Space to output validated gene ID; output$validgeneid
                           textOutput("validgeneid"),
@@ -192,6 +207,7 @@ shinyUI(
                                     value = "", 
                                     placeholder = "Paste ENSEMBL gene ID here...")
                         ),
+                      
                         
                         #####cDNAtype == CDNA SEQUENCE#####
                         
