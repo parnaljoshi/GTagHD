@@ -14,6 +14,7 @@ library(stringr)
 library(plyr)
 #library(biomaRt)
 library(rentrez)
+library(genbankr)
 
 #Required files
 source("functions.R")
@@ -159,7 +160,9 @@ shinyServer(function(input, output, session) {
       )
     })
     if(length(gbFile) > 0){
-      ""
+      validate(
+        need(length(gbFile) > 0, "Error: GenBank ID does not exist.")
+      )
     }
   })
   
@@ -209,7 +212,7 @@ shinyServer(function(input, output, session) {
   })
   
   ######################Gene ID############################
-  #Validate GeneID
+  #Validate ENSEMBL GeneID
   validGeneId <- reactive({
     if(input$geneId != ""){
       if(length(getEnsemblSpecies) > 1){
@@ -251,7 +254,7 @@ shinyServer(function(input, output, session) {
     validGenbankId()
   })
 
-  #Print out the results of gene ID validation
+  #Print out the results of ENSEMBL gene ID validation
   output$validgeneid <- renderText({
     if(is.null(validGeneId())){
       paste0(getEnsemblSpecies(input$geneId)[2], " ENSEMBL gene ID detected.")
@@ -310,6 +313,96 @@ shinyServer(function(input, output, session) {
     } 
   })
 
+  
+  ####GenBank ID submission ####
+  observeEvent(input$genBankSubmit, {
+    resetOutputs()
+    #Check to ensure that all inputs are valid before accepting
+    #FIX THIS###############################################
+    if(is.null(validgRNA()) &&
+       is.null(validCrisprSeq()) &&
+       is.null(validGenbankId())){
+      revFlag <- FALSE
+      resetOutputs()
+      #Convert inputs to uppercase
+      if(input$gRNAtype == 1){
+        guideRNA <- ""
+      } else {
+        guideRNA <- toupper(input$gRNA)
+      }
+      
+      #Get the GenBank sequence with exon/intron information
+      #Make a genbank acession object
+      gba <- GBAccession(input$genbankId)
+      #Get the accession info
+      info <- readGenBank(gba, partial = TRUE, verbose = FALSE)
+      
+      #Get exons from GenBank sequence
+      gbExonsLoci <- info@exons@ranges
+      geneSeq <- as.character(info@sequence)
+      gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
+      
+      uCS <- toupper(input$crisprSeq)
+      exon <- 0
+      i <- 1
+      #For each exon returned...
+      while(exon == 0){
+        ucDNA <- toupper(gbExons[i])
+        
+        #Count how many times the input CRISPR target sequence appears in the exon sequence in the FORWARD direction
+        count <- str_count(ucDNA, uCS)
+        
+        #Count the instance in the reverse complement of the sequence
+        revCount <- str_count(reverseComplement(ucDNA), uCS)
+        
+        #Checks to see if using reverseComplement of cDNA
+        if(revCount == 1 && count == 0){
+          uDNA <- reverseComplement(ucDNA)
+          revFlag <- TRUE
+          exon <- i
+        } else if(count == 1 && revCount == 0){
+          uDNA <- ucDNA
+          revFlag <- FALSE
+          exon <- i
+        }
+        
+        #iterate
+        i <- i + 1
+      }
+      
+      #Determine number of padding nucleotides
+      cutI <- getGenomicCutSite(toupper(uDNA), toupper(input$crisprSeq))
+      if(cutI %% 3 == 0){
+        padNum <- 0
+      } else if(cutI %% 3 == 1){
+        padNum <- 2
+      } else if(cutI %% 3 == 2){
+        padNum <- 1
+      }
+      
+      #Create the oligos
+      if(input$paddingChoice == 1){
+        oligos <<- doCalculations(toupper(uDNA), 
+                                  toupper(input$crisprSeq), 
+                                  guideRNA, 
+                                  as.numeric(input$mh),  
+                                  padNum,
+                                  revFlag)
+      } else {
+        oligos <<- doCalculations(toupper(uDNA), 
+                                  toupper(input$crisprSeq), 
+                                  guideRNA, 
+                                  as.numeric(input$mh),  
+                                  0,
+                                  revFlag)
+      }
+
+      dF$downloadF <<-TRUE
+      printOutputs(oligos)
+    } 
+  })
+  
+  
   
   #Get cDNA/coding sequence from ENSEMBL
   observeEvent(input$geneIdSubmit, {
@@ -439,19 +532,34 @@ shinyServer(function(input, output, session) {
     updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGCAGG")
   })
 
-  
+  observeEvent(input$exampleGenbank, {
+    reset()
+    #Reset the inputs to their default values
+    updateRadioButtons(session, "gRNAtype", selected = 1)
+    updateSelectInput(session, "mh", selected = 24)
+    updateTextAreaInput(session, "crisprSeq", value = "CGCTGAAGTTCTACTAAGGGTGG")
+    updateRadioButtons(session, "cDNAtype", selected = 1)
+    updateTextInput(session, "genbankId", value = "U49845.1")
+    updateRadioButtons(session, "paddingChoice", selected = 1)
+    
+    
+    
+  })
   #Reset function
   reset <- function(){
     
     #Reset the inputs to their default values
     dF$downloadF <<- FALSE
     oligos <<- NULL
-    updateRadioButtons(session, "plasmidCond", selected = 0)
+    #updateRadioButtons(session, "plasmidCond", selected = 0)
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateTextInput(session, "gRNA", value = NA)
     updateTextInput(session, "crisprSeq", value = NA)
     updateRadioButtons(session, "cDNAtype", selected = 2)
     updateTextInput(session, "cDNA", value = NA)
+    updateTextInput(session, "genbankId", value = NA)
+    updateRadioButtons(session, "paddingChoice", selected = 1)
+    #updateTextInput(session, "geneId", value = NA)
     updateSelectInput(session, "mh", selected = 48)
     updateSelectInput(session, "padding", selected = 0)
     updateTextInput(session, "geneId", value = NA)
