@@ -76,6 +76,11 @@ shinyUI(
                         
                         p(""),
                         
+                        #Genbank Example
+                        actionLink("exampleGenbank", 
+                                   label = "GenBank Example"),
+                        p(""),
+                        
                         #ENSEMBL gene ID example; input$exampleEnsembl
                         #actionLink("exampleEnsembl", 
                         #           label = "Example For ENSEMBL Function"),
@@ -145,180 +150,197 @@ shinyUI(
                                         label = "", 
                                         value = "", 
                                         placeholder = "Paste custom gRNA here...")
-                        ),
-                        
-                        ############CRISPR target sequence section#########################
-                        #CRISPR target Instructions
-                        p(paste0("2. Enter the CRISPR target sequence ", 
-                                 "(23 bases total - 20 from target, 3 from PAM):")),
-                        
-                        #Space to output validation results; output$validcrisprseq
-                        textOutput("validcrisprseq"),
-                        
-                        #Box to paste crispr sequence; input$crisprSeq
-                        textAreaInput("crisprSeq", 
-                                      label = "", 
-                                      value = "", 
-                                      placeholder = "Paste CRISPR target sequence here..."),
-                        
-                        
-                        ###########cDNA/Gene ID Section####################################
-                        #Gene ID/cDNA instructions
-                        #p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
-                        #         "the box in PLAIN TEXT format (no FASTA header).")),
-                        
-                        p(paste0("3. Paste a cDNA sequence into ", 
-                                 "the box in PLAIN TEXT format (no FASTA header).")),
-                        p("ENSEMBL gene ID support coming soon."),
-                        
-                        #Buttons to choose cDNAtype; input$cDNAtype
-                        radioButtons("cDNAtype", 
-                                     label = "", 
-                                     choices = list("GenBank Gene ID" = 1,
-                                                    #"ENSEMBL Gene ID" = 3,
-                                                    "Pasted cDNA" = 2), 
-                                     selected = 2),
-                        
-                        #####cDNAtype == GENBANK ID####
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 1",
+                        )),
+                        wellPanel(
                           
-                          #Space to output validated gene ID; output$validgeneid
-                          textOutput("validgenbankid"),
+                          ############CRISPR target sequence section#########################
+                          #CRISPR target Instructions
+                          p(paste0("2. Enter the CRISPR target sequence ", 
+                                   "(23 bases total - 20 from target, 3 from PAM):")),
                           
-                          #Box to paste gene ID; input$geneId
-                          textInput("genbankId", 
-                                    label = "", 
-                                    value = "", 
-                                    placeholder = "Paste GenBank nucleotide gene accession here...")
-                        ),
-                        
-                        #####cDNAtype == GENE ID#####
-                        #This panel displays if the user wants to use an ENSEMBL gene ID
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 3",
+                          #Space to output validation results; output$validcrisprseq
+                          textOutput("validcrisprseq"),
                           
-                          #Space to output validated gene ID; output$validgeneid
-                          textOutput("validgeneid"),
-                          
-                          #Box to paste gene ID; input$geneId
-                          textInput("geneId", 
-                                    label = "", 
-                                    value = "", 
-                                    placeholder = "Paste ENSEMBL gene ID here...")
-                        ),
-                      
-                        
-                        #####cDNAtype == CDNA SEQUENCE#####
-                        
-                        ###This panel displays if the user is putting in their own cDNA sequence##
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 2",
-                          
-                          #Space to output validated cDNA sequence; output$validcdna
-                          textOutput("validcdna"),
-                          
-                          #Box to paste cDNA sequence; input$cDNA
-                          textAreaInput("cDNA", 
+                          #Box to paste crispr sequence; input$crisprSeq
+                          textAreaInput("crisprSeq", 
                                         label = "", 
                                         value = "", 
-                                        placeholder = "Paste cDNA sequence here...", 
-                                        rows = 6),
+                                        placeholder = "Paste CRISPR target sequence here...")
                           
-                          #Padding Selection ################
-                          #This panel displays if the user knows how many padding nucleotides to put in
-                          #Instructions
-                          p("Please select the number of 'padding' nucleotides to repair codon changes."),
                           
-                          #Selection drop-down box; input$padding
-                          selectInput("padding", 
+                          ###########cDNA/Gene ID Section####################################
+                          #Gene ID/cDNA instructions
+                          #p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
+                          #         "the box in PLAIN TEXT format (no FASTA header).")),
+                        ),
+                        wellPanel(
+                          p(paste0("3. Choose target gene input in the form of a GenBank accession number of copy/paste a gene sequence.")),
+                          p("ENSEMBL gene ID support coming soon."),
+                          
+                          #Buttons to choose cDNAtype; input$cDNAtype
+                          radioButtons("cDNAtype", 
+                                       label = "", 
+                                       choices = list("GenBank Gene ID" = 1,
+                                                      #"ENSEMBL Gene ID" = 3,
+                                                      "Pasted cDNA" = 2), 
+                                       selected = 2),
+                          
+                          #####cDNAtype == GENBANK ID####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 1",
+                            
+                            p("Paste GenBank gene accession here. If the entry matching your accession number does not have exon location information, automatic padding generation is not possible."),
+                            #Space to output validated gene ID; output$validgeneid
+                            textOutput("validgenbankid"),
+                            
+                            #Box to paste gene ID; input$geneId
+                            textInput("genbankId", 
                                       label = "", 
-                                      choices = list("0" = 0, 
-                                                     "1" = 1, 
-                                                     "2" = 2), 
-                                      selected = "", 
-                                      width = '100px')
-                        ),
-                        
-                        
-                        
-                        ############Microhomology Selection section########################
-                        #Determine the length of microhomology
-                        #Instructions
-                        p("4. Select the length of microhomology you wish to use (recommended value = 48):"),
-                        
-                        #Slider bar to select mh length; input$mh
-                        selectInput("mh", 
-                                    label = "", 
-                                    choices = c("12" = 12, 
-                                                "24" = 24, 
-                                                "48" = 48),
-                                    selected = 48,
-                                    width = '100px'),
-                        
-                        #Conditionally output microhomology validation for gene ID
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 1",
-                          #Space to output microhomology validation resutls; output$validmhgeneid
-                          textOutput("validmhgeneid")
-                        ),
-                        
-                        #Conditionally output microhomology validation for gene ID
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 2",
+                                      value = "", 
+                                      placeholder = "Paste GenBank nucleotide gene accession here..."),
+                            
+                            p("Do you want to generate 'padding' nucleotides to repair a codon break?"),
+                            radioButtons("paddingChoice",
+                                         label = "",
+                                         choices = list("Yes" = 1,
+                                                        "No"  = 2),
+                                         selected = 1)
+                            
+                          ),
                           
-                          #Space to output microhomology validation resutls; output$validmhcdna
-                          textOutput("validmhcdna")
-                        ),
+                          #####cDNAtype == ENSEMBL ID#####
+                          #This panel displays if the user wants to use an ENSEMBL gene ID
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 3",
+                            
+                            
+                            #Space to output validated gene ID; output$validgeneid
+                            textOutput("validgeneid"),
+                            
+                            #Box to paste gene ID; input$geneId
+                            textInput("geneId", 
+                                      label = "", 
+                                      value = "", 
+                                      placeholder = "Paste ENSEMBL gene ID here...")
+                          ),
+                          
+                          
+                          #####cDNAtype == CDNA SEQUENCE#####
+                          
+                          ###This panel displays if the user is putting in their own cDNA sequence##
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 2",
+                            
+                            p("Please paste your sequence in PLAIN TEXT format. (No FASTA headers.)"),
+                            
+                            #Space to output validated cDNA sequence; output$validcdna
+                            textOutput("validcdna"),
+                            
+                            #Box to paste cDNA sequence; input$cDNA
+                            textAreaInput("cDNA", 
+                                          label = "", 
+                                          value = "", 
+                                          placeholder = "Paste cDNA sequence here...", 
+                                          rows = 6),
+                            
+                            #Padding Selection ################
+                            #This panel displays if the user knows how many padding nucleotides to put in
+                            #Instructions
+                            p("Please select the number of 'padding' nucleotides to repair codon changes."),
+                            
+                            #Selection drop-down box; input$padding
+                            selectInput("padding", 
+                                        label = "", 
+                                        choices = list("0" = 0, 
+                                                       "1" = 1, 
+                                                       "2" = 2), 
+                                        selected = "", 
+                                        width = '100px')
+                          )),
+                        
+                        
+                        wellPanel(
+                          ############Microhomology Selection section########################
+                          #Determine the length of microhomology
+                          #Instructions
+                          p("4. Select the length of microhomology you wish to use (recommended value = 48):"),
+                          
+                          #Slider bar to select mh length; input$mh
+                          selectInput("mh", 
+                                      label = "", 
+                                      choices = c("12" = 12, 
+                                                  "24" = 24, 
+                                                  "48" = 48),
+                                      selected = 48,
+                                      width = '100px'),
+                          
+                          #Conditionally output microhomology validation for gene ID
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 1",
+                            #Space to output microhomology validation resutls; output$validmhgeneid
+                            textOutput("validmhgeneid")
+                          ),
+                          
+                          #Conditionally output microhomology validation for gene ID
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 2",
+                            
+                            #Space to output microhomology validation resutls; output$validmhcdna
+                            textOutput("validmhcdna")
+                          )),
                         
                         
                         
                         ############SUBMIT####################
                         #Conditional display of submit buttons, depending on cDNA type
+                        wellPanel(
+                          #If pasting cDNA ####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 3",
+                            p("After pushing the Submit button, please wait a few seconds for your results to appear."),
+                            actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
+                          ),
+                          
+                          #If using GenBank ID ####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 1",
+                            p("After pushing the Submit button, please wait a few seconds for your results to appear."),
+                            actionButton("genBankSubmit", label = "Submit to GenBank")
+                          ),
+                          
+                          #If using ENSEMBL ID ####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 2",
+                            textOutput("geneProg"),
+                            actionButton("submit", label = "Submit")
+                          )),
                         
-                        #If pasting cDNA ####
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 1",
-                          p("After pushing the Submit button, please wait a few seconds for your results to appear."),
-                          actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
-                        ),
-                        
-                        #If using gene ID ####
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 2",
-                          textOutput("geneProg"),
-                          actionButton("submit", label = "Submit")
-                        ),
-                        
-                        
-                        p(""),
-                        p(""),
-                        p(""),
-                        
-                        
-                        ####Output####
-                        p(""),
-                        p(""),
-                        p("5' forward oligo: "),
-                        textOutput("fivePF"),
-                        p(""),
-                        p(""),
-                        p("5' reverse oligo:"),
-                        textOutput("fivePR"),
-                        p(""),
-                        p(""),
-                        p("3' forward oligo:"),
-                        textOutput("threePF"),
-                        p(""),
-                        p(""),
-                        p("3' reverse oligo:"),
-                        textOutput("threePR"),
-                        
-                        p(""),
-                        p(""),
-                        
-                        uiOutput("downOut")
-                      )
+                        wellPanel(
+                          
+                          
+                          ####Output####
+                          p(""),
+                          p(""),
+                          p("5' forward oligo: "),
+                          textOutput("fivePF"),
+                          p(""),
+                          p(""),
+                          p("5' reverse oligo:"),
+                          textOutput("fivePR"),
+                          p(""),
+                          p(""),
+                          p("3' forward oligo:"),
+                          textOutput("threePF"),
+                          p(""),
+                          p(""),
+                          p("3' reverse oligo:"),
+                          textOutput("threePR"),
+                          
+                          p(""),
+                          p(""),
+                          
+                          uiOutput("downOut")
+                        )
                       )
              ),
              
