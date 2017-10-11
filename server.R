@@ -15,22 +15,24 @@ library(plyr)
 #library(biomaRt)
 library(rentrez)
 library(genbankr)
+library(biofiles)
 
 #Required files
 source("functions.R")
 
 shinyServer(function(input, output, session) {
   
+  #Create global variables to minimize calculations and function calls
   dF <- reactiveValues(downloadF = FALSE)
   oligos <<- NULL
+  gbFile <<- NULL
+  
   ########################################################
   ####################INPUT VALIDATION####################
   ########################################################
   
         ###########GUIDE RNA##############################
   #Check to ensure that the guide RNA is properly formatted, actually a guide RNA, etc.
-  
-  
   validgRNA <- reactive({
     
     #If using custom guide RNA, ensure that only A, C, G, and T are allowed
@@ -52,7 +54,6 @@ shinyServer(function(input, output, session) {
         ###########CRISPR TARGET##########################
   #Ensure that CRISPR sequence is a DNA sequence, is 23 nts long, 
   #has a PAM sequence in either forward or reverse direction 
-  
   validCrisprSeq <- reactive({
     
     #Once text is entered, run through validation tests
@@ -64,16 +65,16 @@ shinyServer(function(input, output, session) {
              paste0("Error: Input DNA sequence contains non-standard nucleotides. ", 
                     "Allowed nucleotides are A, C, G, and T.")),
         
-        #Checks that the target is 23 nucleotides long
+        #Checks that the target is 23 nucleotides long; needs modification for CRISPR agnostic
         need(nchar(uCS) == 23, 
-             "Error: CRISPR target sequence is not 23 nucleotides long. Please check input sequence."),
+             "Error: CRISPR target sequence must include the 20 bp preceding the PAM, and the PAM sequence.")
         
         #Checks that there is a recognizeable PAM sequence in the forward or reverse (or complement) direction
-        need(((substring(uCS, nchar(uCS) - 1, nchar(uCS)) == "GG") | 
-                (substring(uCS, nchar(uCS) - 1, nchar(uCS)) == "CC") |
-                (substring(uCS, 1, 2) == "GG") | 
-                (substring(uCS, 1, 2) == "CC")),
-             "Error: CRISRPR target sequence does not have an identifiable PAM sequence. Please check input sequence.")
+        #need(((substring(uCS, nchar(uCS) - 1, nchar(uCS)) == "GG") | 
+        #        (substring(uCS, nchar(uCS) - 1, nchar(uCS)) == "CC") |
+        #        (substring(uCS, 1, 2) == "GG") | 
+        #        (substring(uCS, 1, 2) == "CC")),
+        #     "Error: CRISRPR target sequence does not have an identifiable PAM sequence. Please check input sequence.")
       )
     } else {
       #Prevent crashing on empty submit
@@ -150,21 +151,7 @@ shinyServer(function(input, output, session) {
       
     })
   
-  #Function to validate the input GenBank ID
-  validGenbankId <- reactive({
-    tryCatch({
-      gbFile = entrez_fetch("nucleotide", input$genbankId, rettype = "gb")
-    }, error = function(err){
-      validate(
-        need(1 == 2, "Error: That GenBank ID does not exist.")
-      )
-    })
-    if(length(gbFile) > 0){
-      validate(
-        need(length(gbFile) > 0, "Error: GenBank ID does not exist.")
-      )
-    }
-  })
+
   
   ######################Microhomology######################
   #Test if microhomology is valid, and troubleshoot if not
@@ -227,6 +214,34 @@ shinyServer(function(input, output, session) {
     } 
   })
   
+  ####################GENBANK INPUTS######################
+  #Function to output results of genbank validation
+  validGenbankId <- function(){
+      validate(
+        need(1 == 2,
+          "Error: This GenBank accession ID does not exist.")
+      )
+  }
+  
+  #Function to determine if Genbank input has valid exon info
+  #exonWarningFunc <- reactive({
+  #  if(!is.null(gbFile) && input$genbankId != "" && !is.null(input$genbankId)){
+  #    gba = readGenBank(text = gbFile, partial = TRUE)
+  #    if(length(exons(gba)) < 1){
+  #      "Warning: This GenBank record does not have annotated exon information. Automatic padding generation is disabled."
+  #      updateRadioButtons(session, "paddingChoice", selected = 2)
+  #    }
+  #  }
+  #})
+  
+  
+  #Function to determine if CRISPR target cut will be in an exon
+  
+  #Function to determine that CRISPR target appears in Genbank sequence exactly once
+  
+  #Function to determine if MH length is okay for CRISPR target
+  
+  
   ########################################################
   ##############PRINT VALIDATION RESULTS##################
   ########################################################
@@ -249,10 +264,6 @@ shinyServer(function(input, output, session) {
   output$validmhcdna <- renderText({
     validMHCDna()
   })
-  
-  output$validgenbankid <- renderText({
-    validGenbankId()
-  })
 
   #Print out the results of ENSEMBL gene ID validation
   output$validgeneid <- renderText({
@@ -262,6 +273,12 @@ shinyServer(function(input, output, session) {
       validGeneId()
     }
   })
+  
+  #output$exonWarning <- renderText({
+  #  if(!is.null(gbFile)){
+  #    exonWarningFunc()
+  #  }
+  #})
   
   ########################################################
   ################PERFORM CALCULATIONS####################
@@ -277,38 +294,31 @@ shinyServer(function(input, output, session) {
       revFlag <- FALSE
       resetOutputs()
       #Convert inputs to uppercase
-      if(input$gRNAtype == 1){
-        guideRNA <- ""
-      } else {
-        guideRNA <- toupper(input$gRNA)
-      }
+      guideRNA <- toupper(input$gRNA)
       
       ucDNA <- toupper(input$cDNA)
       uCS <- toupper(input$crisprSeq)
       
-      #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the FORWARD direction
-      count <- str_count(ucDNA, uCS)
+
+      #Determine if the CRISPR is on the forward or reverse strand
+      rev <- revCheck(ucDNA, uCS)
       
-      #Count the instance in the reverse complement of the sequence
-      revCount <- str_count(reverseComplement(ucDNA), uCS)
-      
-      #Checks to see if using reverseComplement of cDNA
-      if(revCount == 1 && count == 0){
-        uDNA <- reverseComplement(input$cDNA)
-        revFlag <- TRUE
-      } else {
-        uDNA <- input$cDNA
-        revFlag <- FALSE
-      }
+      uDNA    <- rev[1]
+      revFlag <- rev[2]
+
       
       #Create the oligos
-      oligos <<- doCalculations(toupper(uDNA), 
-                               toupper(input$crisprSeq), 
+      oligos <<- doCalculations(uDNA, 
+                               uCS, 
                                guideRNA, 
                                as.numeric(input$mh),  
                                input$padding,
                                revFlag)
+      
+      #Flag the download button so that it becomes visible
       dF$downloadF <<-TRUE
+      
+      #Output the oligos
       printOutputs(oligos)
     } 
   })
@@ -317,88 +327,127 @@ shinyServer(function(input, output, session) {
   ####GenBank ID submission ####
   observeEvent(input$genBankSubmit, {
     resetOutputs()
-    #Check to ensure that all inputs are valid before accepting
+    #Check to ensure that all other inputs are valid before proceding
     #FIX THIS###############################################
     if(is.null(validgRNA()) &&
-       is.null(validCrisprSeq()) &&
-       is.null(validGenbankId())){
+       is.null(validCrisprSeq())){
       revFlag <- FALSE
-      resetOutputs()
-      #Convert inputs to uppercase
-      if(input$gRNAtype == 1){
-        guideRNA <- ""
-      } else {
-        guideRNA <- toupper(input$gRNA)
-      }
       
+      #Clear Outputs
+      resetOutputs()
+      
+      #Try to pull genbank entry associated with accession
       #Get the GenBank sequence with exon/intron information
       #Make a genbank acession object
       gba <- GBAccession(input$genbankId)
-      #Get the accession info
-      info <- readGenBank(gba, partial = TRUE, verbose = FALSE)
       
-      #Get exons from GenBank sequence
-      gbExonsLoci <- info@exons@ranges
-      geneSeq <- as.character(info@sequence)
-      gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
+      endOfTry <- FALSE
+      
+      #Try to get the accession info
+      tryCatch({
+        info <- readGenBank(gba, partial = TRUE, verbose = FALSE)
+        
+        endOfTry <- TRUE
+      }, error = function(err){
+        output$validgenbankid <- renderText({
+          validGenbankId()
+        })
+      })
       
       uCS <- toupper(input$crisprSeq)
-      exon <- 0
-      i <- 1
-      #For each exon returned...
-      while(exon == 0){
-        ucDNA <- toupper(gbExons[i])
+      
+      #Only executes if GenBank ID is valid
+      if(endOfTry){
+        
+        #Convert gRNA to upper case
+        guideRNA <- toupper(input$gRNA)
+        
+        #Search for CRISPR in input sequence
+        geneSeq <- as.character(info@sequence)
         
         #Count how many times the input CRISPR target sequence appears in the exon sequence in the FORWARD direction
-        count <- str_count(ucDNA, uCS)
+        count <- str_count(geneSeq, uCS)
         
         #Count the instance in the reverse complement of the sequence
-        revCount <- str_count(reverseComplement(ucDNA), uCS)
+        revCount <- str_count(reverseComplement(geneSeq), uCS)
         
-        #Checks to see if using reverseComplement of cDNA
-        if(revCount == 1 && count == 0){
-          uDNA <- reverseComplement(ucDNA)
-          revFlag <- TRUE
-          exon <- i
-        } else if(count == 1 && revCount == 0){
-          uDNA <- ucDNA
-          revFlag <- FALSE
-          exon <- i
+        #Kicks an error if CRISPR occurs multiple times in sequence
+        if(revCount > 1 || count > 1 || (revCount == 1 && count == 1)){
+          output$validgenbankDNA <- renderText({
+            validate(
+              need(1 == 2,
+                   "Error: CRISPR target appears multiple times in the sequence associated with this GenBank Accession ID.")
+            )
+          })
+          
+        } else if(revCount == 0 && count == 0){
+          #Kicks an error if CRISPR does not occur in sequence
+          output$validgenbankDNA <- renderText({
+            validate(
+              need(1 == 2,
+                   "Error: CRISPR target does not appear in the sequence associated with this GenBank Accession ID.")
+            )
+          })
+        } else {
+          #If CRISPR appears exactly once in sequence:
+          
+          #Determine whether CRISPR is in forward or reverse strand
+          if(revCount == 1 && count == 0){
+            uDNA <- reverseComplement(ucDNA)
+            revFlag <- TRUE
+          } else {
+            uDNA <- ucDNA
+            revFlag <- FALSE
+          } 
+          #Get exons from GenBank sequence
+          gbExonsLoci <- info@exons@ranges
+          
+          gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
+          
+          uCS <- toupper(input$crisprSeq)
+          
+          #Set exon to 0; will be overwritten if the CRISPR sequence is found in an exon
+          exon <- 0
+          
+          #
+          i <- 1
+          
+          #For each exon returned...
+          while(exon == 0){
+            ucDNA <- toupper(gbExons[i])
+            
+            
+            
+            
+            
+            #iterate
+            i <- i + 1
+          }
+          
+          #Determine number of padding nucleotides
+          padNum <- getGenBankPadding(uDNA, uCS)
+          
+          #Create the oligos
+          if(input$paddingChoice == 1){
+            oligos <<- doCalculations(uDNA, 
+                                      uCS, 
+                                      guideRNA, 
+                                      as.numeric(input$mh),  
+                                      padNum,
+                                      revFlag)
+          } else {
+            oligos <<- doCalculations(uDNA, 
+                                      uCS, 
+                                      guideRNA, 
+                                      as.numeric(input$mh),  
+                                      0,
+                                      revFlag)
+          }
+          
+          dF$downloadF <<-TRUE
+          printOutputs(oligos)
         }
-        
-        #iterate
-        i <- i + 1
       }
-      
-      #Determine number of padding nucleotides
-      cutI <- getGenomicCutSite(toupper(uDNA), toupper(input$crisprSeq))
-      if(cutI %% 3 == 0){
-        padNum <- 0
-      } else if(cutI %% 3 == 1){
-        padNum <- 2
-      } else if(cutI %% 3 == 2){
-        padNum <- 1
-      }
-      
-      #Create the oligos
-      if(input$paddingChoice == 1){
-        oligos <<- doCalculations(toupper(uDNA), 
-                                  toupper(input$crisprSeq), 
-                                  guideRNA, 
-                                  as.numeric(input$mh),  
-                                  padNum,
-                                  revFlag)
-      } else {
-        oligos <<- doCalculations(toupper(uDNA), 
-                                  toupper(input$crisprSeq), 
-                                  guideRNA, 
-                                  as.numeric(input$mh),  
-                                  0,
-                                  revFlag)
-      }
-
-      dF$downloadF <<-TRUE
-      printOutputs(oligos)
     } 
   })
   
@@ -418,11 +467,7 @@ shinyServer(function(input, output, session) {
       setProgress(message = "Identifying Species...")
       species <- getEnsemblSpecies(toupper(input$geneId))
       
-      if(input$gRNAtype == 1){
-        guideRNA <- ""
-      } else {
-        guideRNA <- toupper(input$gRNA)
-      }
+      guideRNA <- toupper(input$gRNA)
       
       setProgress(message = "Querying ENSEMBL database...")
       
@@ -446,7 +491,7 @@ shinyServer(function(input, output, session) {
     })
   })
 
-  #Function to print the output
+  ####Function to print the oligo output####
   printOutputs <- function(oligos){
     #Print out the 5' forward oligo
     output$fivePF <- renderText({
@@ -469,15 +514,16 @@ shinyServer(function(input, output, session) {
     })
   }
   
+  ####Function to render download button for downloading oligos
   output$downOut <- renderUI({
     if(dF$downloadF){
-        downloadButton("downOligos", "Download Oligos")
+      downloadButton("downOligos", "Download Oligos")
     } else{
-  ""
-}
+      ""
+    }
   })
   
-  
+  ####Function to handle file generation for downloading oligos
   output$downOligos <- downloadHandler(
     filename = function(){
       paste(gsub("CDT", "", gsub(" ", "_", Sys.time())), "_oligos.txt")},
@@ -548,9 +594,11 @@ shinyServer(function(input, output, session) {
   #Reset function
   reset <- function(){
     
-    #Reset the inputs to their default values
+    #Reset the global inputs to their default values
     dF$downloadF <<- FALSE
     oligos <<- NULL
+    gbFile <<- NULL
+    
     #updateRadioButtons(session, "plasmidCond", selected = 0)
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateTextInput(session, "gRNA", value = NA)
