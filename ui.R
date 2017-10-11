@@ -127,14 +127,10 @@ shinyUI(
                         #),
                         ############Guide RNA selection section############################ 
                         #Guide RNA instructions
-                        p(paste0("1. Select the guide RNA type. ",
-                                 "You can use the universal guide RNA, or paste a custom ", 
-                                 "guide sequence in PLAIN TEXT format (no FASTA header).")),
-                        
                         #Buttons to select input$gRNAtype
                         radioButtons("gRNAtype", 
-                                     label = "", 
-                                     choices = list("Universal Guide RNA (for use with pGTag Series plasmids)" = 1, 
+                                     label = "1. Select the guide RNA type. You can use the universal guide RNA (for use with pGTag Series plasmids), or paste a custom guide sequence in PLAIN TEXT format (no FASTA header.)", 
+                                     choices = list("Universal Guide RNA" = 1, 
                                                     "Custom Guide RNA" = 2), 
                                      selected = 1),
                         
@@ -155,9 +151,21 @@ shinyUI(
                           
                           ############CRISPR target sequence section#########################
                           #CRISPR target Instructions
-                          p(paste0("2. Enter the CRISPR target sequence ", 
-                                   "(23 bases total - 20 from target, 3 from PAM):")),
+                          p(tags$div(tags$b("2. Enter the CRISPR target sequence. Please only include the 20 nt target sequence; DO NOT include the PAM sequence."))),
                           
+                          #conditionalPanel(
+                          #  condition = "input.sense == 0",
+                          #  p("Please include the 20 nucleotides preceding the PAM AND the PAM sequence."),
+                          #  p("For example, a target for SpCas9 should have a sequence 23 bp long - 20 nucleotides, plus the 3 bp 5'-NGG-3' PAM sequence."),
+                          #  p("GTagHD assumes that the CRISPR will cut 3bp upstream of your PAM sequence.")
+                          #),
+                          #conditionalPanel(
+                          #  condition = "input.sense == 1",
+                          #  p("Please include the PAM sequence and the 20 nucleotides succeding the PAM."),
+                          #  p("For example, a target for SaCas9 should have a sequence 26 bp long - the reverse complement of the 5'-NNNRRT-3' PAM, followed by 20 nucleotides."),
+                          #  p("GTagHD assumes that the CRISPR will cut 3bp downstream of the end of the PAM sequence.")
+                          #),
+                          p("GTagHD assumes that your CRISPR will cut between bases 17 and 18 in the case of a 5'-3' targeting sequence, and between bases 3 and 4 in the case of a 3'-5' targeting sequence, which is consistent with most Cas9 species. See 'Instructions and FAQ' tab for further clarification."),
                           #Space to output validation results; output$validcrisprseq
                           textOutput("validcrisprseq"),
                           
@@ -165,8 +173,14 @@ shinyUI(
                           textAreaInput("crisprSeq", 
                                         label = "", 
                                         value = "", 
-                                        placeholder = "Paste CRISPR target sequence here...")
+                                        placeholder = "Paste CRISPR target sequence here..."),
                           
+                          radioButtons("sense",
+                                       label = "Is your CRISPR target sequence in the sense (5'-target-PAM-3') or anti-sense (5'-PAM-target-3') orientation?",
+                                       choices = c("sense" = 0,
+                                                   "anti-sense" = 1),
+                                       selected = 0,
+                                       inline = TRUE)
                           
                           ###########cDNA/Gene ID Section####################################
                           #Gene ID/cDNA instructions
@@ -174,37 +188,38 @@ shinyUI(
                           #         "the box in PLAIN TEXT format (no FASTA header).")),
                         ),
                         wellPanel(
-                          p(paste0("3. Choose target gene input in the form of a GenBank accession number of copy/paste a gene sequence.")),
-                          p("ENSEMBL gene ID support coming soon."),
-                          
                           #Buttons to choose cDNAtype; input$cDNAtype
                           radioButtons("cDNAtype", 
-                                       label = "", 
+                                       label = "3. Specify the target gene of interest in the form of a GenBank accession number, or copy/paste the gene sequence.", 
                                        choices = list("GenBank Gene ID" = 1,
                                                       #"ENSEMBL Gene ID" = 3,
                                                       "Pasted cDNA" = 2), 
-                                       selected = 2),
-                          
+                                       selected = 1),
+                          p("ENSEMBL gene ID support coming soon."),
                           #####cDNAtype == GENBANK ID####
                           conditionalPanel(
                             condition = "input.cDNAtype == 1",
                             
-                            p("Paste GenBank gene accession here. If the entry matching your accession number does not have exon location information, automatic padding generation is not possible."),
+                            p("Paste GenBank Accession here. If the entry matching your accession number does not have exon location information, automatic 'padding' nucleotide generation is not possible."),
                             #Space to output validated gene ID; output$validgeneid
                             textOutput("validgenbankid"),
                             
+                            textOutput("validgenbankDNA"),
                             #Box to paste gene ID; input$geneId
                             textInput("genbankId", 
                                       label = "", 
                                       value = "", 
                                       placeholder = "Paste GenBank nucleotide gene accession here..."),
                             
+                            textOutput("exonWarning"),
+                            
                             p("Do you want to generate 'padding' nucleotides to repair a codon break?"),
                             radioButtons("paddingChoice",
-                                         label = "",
-                                         choices = list("Yes" = 1,
+                                         label    = "",
+                                         choices  = list("Yes" = 1,
                                                         "No"  = 2),
-                                         selected = 1)
+                                         selected = 1,
+                                         inline = TRUE)
                             
                           ),
                           
@@ -268,8 +283,9 @@ shinyUI(
                           #Slider bar to select mh length; input$mh
                           selectInput("mh", 
                                       label = "", 
-                                      choices = c("12" = 12, 
+                                      choices = c("12" = 12,
                                                   "24" = 24, 
+                                                  "36" = 36,
                                                   "48" = 48),
                                       selected = 48,
                                       width = '100px'),
@@ -372,10 +388,14 @@ shinyUI(
                )),
                
                #Text area in center of page
-               column(9, wellPanel(
+               column(9, 
+               wellPanel(
                  p("Please contact GTagHDHelp@gmail.com to report issues and request support."),
-                 p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
-               ))
+                 p("Before submitting a bug report, please read the instructions below on how to write a helpful bug report."),
+                 p("By following these instructions, we will be able to solve your issue more quickly.")),
+               wellPanel(
+                 includeHTML("www/20170921_A_Guide_to_Writing_Helpful_Bug_Reports.html"))
+             )
                
              ),
              ##########TOOLS AND DOWNLOADS TAB#################################
@@ -390,6 +410,9 @@ shinyUI(
                
                #Text area in center of page
                column(9, wellPanel(
+                      p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
+               ),
+                      wellPanel(
                  #p("Download standalone version, or other stuff."),
                  
                  h1("Download G-Series Plasmid Sequences"),
