@@ -18,18 +18,24 @@
 #' @examples
 #'
 
-doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag){
+doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orientation, progress){
+  
   #' Determine the location of the CRISPR cut site in the cDNA sequence:
-  cutSite <- getGenomicCutSite(toupper(dnaSeq), toupper(crisprSeq))
+  cutSite <- getGenomicCutSite(toupper(dnaSeq), toupper(crisprSeq), orientation)
   #' Construct oligos correctly if reverse flag has been applied
   if(revFlag == FALSE){
+    progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
     fiveData <- get5Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
+    
+    progress$set(detail = "generating 3' oligos", value = 0.8)
     #' Calculate the 3' oligo targeting domains
     threeData <- get3Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite)
   } else {
+    progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
     fiveData <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
+    progress$set(detail = "generating 3' oligos", value = 0.8)
     #' Calculate the 3' oligo targeting domains
     threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite)
   }
@@ -42,7 +48,7 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag){
 #' This function takes a cDNA/gene sequence and a CRISPR sequence, and determines the CRISPR cut site in the cDNA sequence. It is highly recommended that you check the validity of the cDNA/gene sequence with isDnaSeqValid(), the CRISPR sequence with isCrisprSeqValid(), and that the CRISPR sequence appears only once in the cDNA/gene sequence with crisprTargetAppearances(). The function may throw errors if any of the above checks fail.
 #'
 #' @param dnaSeq A character sequence containing cDNA or gene that the crisprSeq targets
-#' @param crisprSeq A 23-character sequence containing a CRISPR target
+#' @param crisprSeq A 20-character sequence without PAM sequence
 #'
 #' @return cutIndex The location index of where in dnaSeq the CRISPR target will be cut
 #' @export
@@ -52,18 +58,26 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag){
 #' crisprSeq <- "GCATGATCGTAGCATGCATGAGG"
 #' getGenomicCutSite(dnaSeq, crisprSeq)
 
-getGenomicCutSite <- function(dnaSeq, crisprSeq){
+getGenomicCutSite <- function(dnaSeq, crisprSeq, orientation){
   #Determine where in the sequence the crispr is located
   crisprLoc <- unlist(str_locate_all(dnaSeq, crisprSeq))
   
+  
+  if(orientation == 0){
+    #If the CRISPR is in the sense strand, cut between bases 17 and 18 in the matching sequence.
+    cutIndex <- crisprLoc[2] - 3
+  } else {
+    #If the CRISPR is in the anti-sense strand, cut between bases 3 and 4 in the matching sequence.
+    cutIndex <- crisprLoc[1] + 2
+  }
   #If the crispr ends with NGG (it is in the forward direction), cut before the PAM sequence:
-  if((substring(crisprSeq, nchar(crisprSeq) - 1, nchar(crisprSeq)) == "GG") | (substring(crisprSeq, nchar(crisprSeq) - 1, nchar(crisprSeq)) == "gg")){
-    cutIndex <- crisprLoc[2] - 6
+  #if((substring(crisprSeq, nchar(crisprSeq) - 1, nchar(crisprSeq)) == "GG") | (substring(crisprSeq, nchar(crisprSeq) - 1, nchar(crisprSeq)) == "gg")){
+  #  cutIndex <- crisprLoc[2] - 6
     
     #If the crispr begins with CCN (it is in the reverse direction), cut after the PAM sequence:
-  } else {
-    cutIndex <- crisprLoc[1] + 5
-  }
+  #} else {
+  #  cutIndex <- crisprLoc[1] + 5
+  #}
   
   return(cutIndex)
 }
@@ -616,3 +630,37 @@ pingGeneId <- function(id){
     return(FALSE)
   }
 }
+
+
+
+####Misc Functions specific to GTagHD####
+#Checks to see if using reverseComplement of cDNA
+revCheck <- function(ucDNA, uCS){
+  #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the FORWARD direction
+  count <- str_count(ucDNA, uCS)
+  
+  #Count the instance in the reverse complement of the sequence
+  revCount <- str_count(reverseComplement(ucDNA), uCS)
+  
+  if(revCount == 1 && count == 0){
+    uDNA <- reverseComplement(ucDNA)
+    revFlag <- TRUE
+  } else {
+    uDNA <- ucDNA
+    revFlag <- FALSE
+  }
+  return(c(uDNA, revFlag))
+}
+
+#Get padding for codon repairs for GenBank Accessions
+getGenBankPadding <- function(uDNA, uCS, orientation){
+  #Get the location of the cut site
+  cutI <- getGenomicCutSite(uDNA, uCS, orientation)
+  #Determine how many padding nucleotide 
+  if(cutI %% 3 == 0){
+    return(0)
+  } else {
+    return(3 - (cutI %% 3))
+  }
+}
+
