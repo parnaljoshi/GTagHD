@@ -52,8 +52,8 @@ shinyServer(function(input, output, session) {
   })
   
         ###########CRISPR TARGET##########################
-  #Ensure that CRISPR sequence is a DNA sequence, is 23 nts long, 
-  #has a PAM sequence in either forward or reverse direction 
+  #Ensure that CRISPR sequence is a DNA sequence, is 20 nts long, 
+  #and is present in forward/reverse direction exactly once
   validCrisprSeq <- reactive({
     
     #Once text is entered, run through validation tests
@@ -65,9 +65,9 @@ shinyServer(function(input, output, session) {
              paste0("Error: Input DNA sequence contains non-standard nucleotides. ", 
                     "Allowed nucleotides are A, C, G, and T.")),
         
-        #Checks that the target is 23 nucleotides long; needs modification for CRISPR agnostic
-        need(nchar(uCS) == 23, 
-             "Error: CRISPR target sequence must include the 20 bp preceding the PAM, and the PAM sequence.")
+        #Checks that the target is 23 nucleotides long; needs modification for CRISPR agnostic - DEPRECATED DUE TO VARIABLE PAMS ALLOWED
+        #need(nchar(uCS) == 23, 
+        #     "Error: CRISPR target sequence must include the 20 bp preceding the PAM, and the PAM sequence.")
         
         #Checks that there is a recognizeable PAM sequence in the forward or reverse (or complement) direction
         #need(((substring(uCS, nchar(uCS) - 1, nchar(uCS)) == "GG") | 
@@ -75,6 +75,10 @@ shinyServer(function(input, output, session) {
         #        (substring(uCS, 1, 2) == "GG") | 
         #        (substring(uCS, 1, 2) == "CC")),
         #     "Error: CRISRPR target sequence does not have an identifiable PAM sequence. Please check input sequence.")
+        
+        #Checks that the target is 20 nucleotides long
+        need(nchar(uCS) == 20,
+             "Error: Input should be 20 nucleotides long.")
       )
     } else {
       #Prevent crashing on empty submit
@@ -175,27 +179,39 @@ shinyServer(function(input, output, session) {
         crisprLoc <- unlist(str_locate_all(uDNA, input$crisprSeq))
         
         #If the crispr ends with NGG (it is in the forward direction), cut before the PAM sequence:
-        if((substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "GG") | 
-           (substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "gg")){
-          cutIndex <- crisprLoc[2] - 6
-          
-          #If the crispr begins with CCN (it is in the reverse direction), cut after the PAM sequence:
-        } else if((substring(input$crisprSeq, 1, 2) == "CC") | (substring(input$crisprSeq, 1, 2) == "cc")){
-          cutIndex <- crisprLoc[1] + 5
+        #if((substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "GG") | 
+        #   (substring(input$crisprSeq, nchar(input$crisprSeq) - 1, nchar(input$crisprSeq)) == "gg")){
+        #  cutIndex <- crisprLoc[2] - 6
+        
+        #If the crispr begins with CCN (it is in the reverse direction), cut after the PAM sequence:
+        #} else if((substring(input$crisprSeq, 1, 2) == "CC") | (substring(input$crisprSeq, 1, 2) == "cc")){
+        #  cutIndex <- crisprLoc[1] + 5
+        #}
+        #If the crispr is in the sense direction
+        
+        if(input$sense == 0){
+          #If the CRISPR is in the sense strand, cut between bases 17 and 18 in the matching sequence.
+          cutIndex <- crisprLoc[2] - 3
+        } else if(input$sense == 1) {
+          #If the CRISPR is in the anti-sense strand, cut between bases 3 and 4 in the matching sequence.
+          cutIndex <- crisprLoc[1] + 2
         }
         
-        validate(
-          if(revCount == 0 && count == 1){
+        
+        if((revCount == 0 && count == 1)||(revCount == 1 && count == 0)){
+          validate(
+            #Check to make sure that the microhomology length won't run off the beginning of the sequence
             need(cutIndex - as.numeric(input$mh) >= 0, 
                  paste0("Error: Microhomology length is too long for this CRISPR target sequence and cDNA pairing. ",
-                        "Choose a smaller homology length. Maximum allowed homology ", 
-                        "length for this cDNA/CRISPR pairing is ", 
-                        cutIndex - 1, " nucleotides."))
-          }
-        )
-        
-        }
+                        "Choose a smaller homology length.")),
+            #Check to make sure that the microhomology length won't run off the end of the sequence
+            need(nchar(uDNA) - as.numeric(input$mh) >= cutIndex,
+                 paste0("Error: Microhomology length is too long for this CRISPR target sequence and cDNA pairing. ",
+                        "Choose a smaller homology length."))
+          )
+        } 
       }
+    }
   })
   
   ######################Gene ID############################
@@ -224,15 +240,15 @@ shinyServer(function(input, output, session) {
   }
   
   #Function to determine if Genbank input has valid exon info
-  #exonWarningFunc <- reactive({
-  #  if(!is.null(gbFile) && input$genbankId != "" && !is.null(input$genbankId)){
-  #    gba = readGenBank(text = gbFile, partial = TRUE)
-  #    if(length(exons(gba)) < 1){
-  #      "Warning: This GenBank record does not have annotated exon information. Automatic padding generation is disabled."
-  #      updateRadioButtons(session, "paddingChoice", selected = 2)
-  #    }
-  #  }
-  #})
+  exonWarningFunc <- reactive({
+    if(!is.null(gbFile) && input$genbankId != "" && !is.null(input$genbankId)){
+      gba = readGenBank(text = gbFile, partial = TRUE)
+      if(length(exons(gba)) < 1){
+        "Warning: This GenBank record does not have annotated exon information. Automatic padding generation is disabled."
+        updateRadioButtons(session, "paddingChoice", selected = 2)
+      }
+    }
+  })
   
   
   #Function to determine if CRISPR target cut will be in an exon
@@ -274,11 +290,11 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  #output$exonWarning <- renderText({
-  #  if(!is.null(gbFile)){
-  #    exonWarningFunc()
-  #  }
-  #})
+  output$exonWarning <- renderText({
+    if(!is.null(gbFile)){
+      exonWarningFunc()
+    }
+  })
   
   ########################################################
   ################PERFORM CALCULATIONS####################
@@ -293,11 +309,11 @@ shinyServer(function(input, output, session) {
        is.null(validCDNA())){
       revFlag <- FALSE
       resetOutputs()
+      
       #Convert inputs to uppercase
       guideRNA <- toupper(input$gRNA)
-      
-      ucDNA <- toupper(input$cDNA)
-      uCS <- toupper(input$crisprSeq)
+      ucDNA    <- toupper(input$cDNA)
+      uCS      <- toupper(input$crisprSeq)
       
 
       #Determine if the CRISPR is on the forward or reverse strand
@@ -306,14 +322,22 @@ shinyServer(function(input, output, session) {
       uDNA    <- rev[1]
       revFlag <- rev[2]
 
+      #Set up the progress bar
+      progress <- Progress$new(session)
+      on.exit(progress$close())
+      progress$set(message = "Generating Oligos: ")
       
       #Create the oligos
       oligos <<- doCalculations(uDNA, 
-                               uCS, 
-                               guideRNA, 
-                               as.numeric(input$mh),  
-                               input$padding,
-                               revFlag)
+                                uCS, 
+                                guideRNA, 
+                                as.numeric(input$mh),  
+                                input$padding,
+                                revFlag,
+                                input$sense,
+                                progress)
+      
+      progress$set(detail = "Done", value = 1)
       
       #Flag the download button so that it becomes visible
       dF$downloadF <<-TRUE
@@ -326,15 +350,22 @@ shinyServer(function(input, output, session) {
   
   ####GenBank ID submission ####
   observeEvent(input$genBankSubmit, {
+    
     resetOutputs()
     #Check to ensure that all other inputs are valid before proceding
-    #FIX THIS###############################################
     if(is.null(validgRNA()) &&
        is.null(validCrisprSeq())){
       revFlag <- FALSE
       
       #Clear Outputs
       resetOutputs()
+      
+      #Set up a progress object
+      progress <- Progress$new(session)
+      on.exit(progress$close())
+      progress$set(message = "Generating Oligos: ")
+      
+      progress$set(detail = "Retrieving GenBank entry...", value = 0.1)
       
       #Try to pull genbank entry associated with accession
       #Get the GenBank sequence with exon/intron information
@@ -354,13 +385,17 @@ shinyServer(function(input, output, session) {
         })
       })
       
-      uCS <- toupper(input$crisprSeq)
+      
       
       #Only executes if GenBank ID is valid
       if(endOfTry){
+        #Convert CRISPR seq to upper case
+        uCS <- toupper(input$crisprSeq)
         
         #Convert gRNA to upper case
         guideRNA <- toupper(input$gRNA)
+        
+        progress$set(detail = "Searching for target in GenBank sequence...", value = 0.2)
         
         #Search for CRISPR in input sequence
         geneSeq <- as.character(info@sequence)
@@ -390,6 +425,7 @@ shinyServer(function(input, output, session) {
           })
         } else {
           #If CRISPR appears exactly once in sequence:
+          ucDNA <- toupper(geneSeq)
           
           #Determine whether CRISPR is in forward or reverse strand
           if(revCount == 1 && count == 0){
@@ -399,33 +435,34 @@ shinyServer(function(input, output, session) {
             uDNA <- ucDNA
             revFlag <- FALSE
           } 
+          
+          orientation <- input$sense
+            
+          progress$set(detail = "Identifying exons...", value = 0.3)
+          
           #Get exons from GenBank sequence
           gbExonsLoci <- info@exons@ranges
           
           gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
           
-          uCS <- toupper(input$crisprSeq)
+          cutI <- getGenomicCutSite(ucDNA, input$crisprSeq, orientation)
           
-          #Set exon to 0; will be overwritten if the CRISPR sequence is found in an exon
-          exon <- 0
+          #Find the exon that the cut occurs in
+          exon <- IRanges:::findOverlaps(IRanges:::IRanges(cutI, cutI), info@exons@ranges, type = "within", select = "first")
           
-          #
-          i <- 1
+          progress$set(detail = "Generating padding...", value = 0.4)
           
-          #For each exon returned...
-          while(exon == 0){
-            ucDNA <- toupper(gbExons[i])
-            
-            
-            
-            
-            
-            #iterate
-            i <- i + 1
+          #Find how many nucleotides are between the start of the exon and the cut site
+          nucs <- cutI - start(info@exons@ranges[exon]) + 1
+          
+          if(nucs %% 3 == 0){
+            padNum <- 0
+          } else {
+            padNum <- 3 - (nucs %% 3)
           }
           
           #Determine number of padding nucleotides
-          padNum <- getGenBankPadding(uDNA, uCS)
+          #padNum <- getGenBankPadding(info, uCS, exon, orientation)
           
           #Create the oligos
           if(input$paddingChoice == 1){
@@ -434,16 +471,20 @@ shinyServer(function(input, output, session) {
                                       guideRNA, 
                                       as.numeric(input$mh),  
                                       padNum,
-                                      revFlag)
+                                      revFlag,
+                                      input$sense,
+                                      progress)
           } else {
             oligos <<- doCalculations(uDNA, 
                                       uCS, 
                                       guideRNA, 
                                       as.numeric(input$mh),  
                                       0,
-                                      revFlag)
+                                      revFlag,
+                                      input$sense,
+                                      progress)
           }
-          
+          progress$set(detail = "Done", value = 1)
           dF$downloadF <<-TRUE
           printOutputs(oligos)
         }
@@ -556,7 +597,7 @@ shinyServer(function(input, output, session) {
     updateTextInput(session, "gRNA", value = "")
     updateSelectInput(session, "mh", selected = 24)
     updateSelectInput(session, "padding", selected = 0)
-    updateTextInput(session, "crisprSeq", value = "GCGCAGCGAGTCAGTGAGCGAGG")
+    updateTextInput(session, "crisprSeq", value = "GCGCAGCGAGTCAGTGAGCG")
     updateTextInput(session, "cDNA", value = "CTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTATTACCGCCTTTGAGTGAGCTGATACCGCTCGCCGCAGCCGAACGACCGAGCGCAGCGAGTCAGTGAGCGAGGAAGCGGAAGAGCGCCCAATACGCAAACCGCCTCTCCCCGCGCGTTGGCCGATTCATTAATGCAGCTGGCACGACAGGTTTCCCGACTGGAAAGCGGGCAGTGAGCGCAACGCAATTAATACGCGTACCGCTAGCCAGGAAGAGTTTGTAGAAACGCAAAAAGGCCATCCGTCAGGATGGCCTTCTGCTTAGTTTGATGCCTGGCAGTTTATGGCGGGCGTCCTGCCCGCCACCCTCCGGGCCGTTGCTTCACAACGTTCAAATCCGCTCCCGGCGGATTTGTCCTACTCAGGAGAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTCCGACTGAGCCTTTCGTTTTATTTGATGCCTGGCAGTTCCCTACTCTCGCGTTAACGCTAGCATGGATGTTTTCCCAGTCACGACGTTGTAAAACGACGGCCAGTCTTAAGCTCGGGCCCTGCAGCTCTAGAGCTCGAATTCGGGAGCGCAGAGCTGGAGACAGGCAAACGCCTGTCGGATCCGGAGCCACGAACTTCTCTCTGTTAAAGCAAGCAGGAGACGTGGAAGAAAACCCCGGTCCTATGGTGTCTAAGGGCGAAGAGCTGATTAAGGAGAACATGCACATGAAGCTGTACATGGAGGGCACCGTGAACAACCACCACTTCAAGTGCACATCCGAGGGCGAAGGCAAGCCCTACGAGGGCACCCAGACCATGAGAATCAAGGTGGTCGAGGGCGGCCCTCTCCCCTTCGCCTTCGACATCCTGGCTACCAGCTTCATGTACGGCAGCAGAACCTTCATCAACCACACCCAGGGCATCCCCGACTTCTTTAAGCAGTCCTTCCCTGAGGGCTTCACATGGGAGAGAGTCACCACATACGAAGACGGGGGCGTGCTGACCGCTACCCAGGACACCAGCCTCCAGGACGGCTGCCTCATCTACAACGTCAAGATCAGAGGGGTGAACTTCCCATCCAACGGCCCTGTGATGCAGAAGAAAACACTCGGCTGGGAGGCCAACACCGAGATGCTGTACCCCGCTGACGGCGGCCTGGAAGGCAGAAGCGACATGGCCCTGAAGCTCGTGGGCGGGGGCCACCTGATCTGCAACTTCAAGACCACATACAGATCCAAGAAACCCGCTAAGAACCTCAAGATGCCCGGCGTCTACTATGTGGACCACAGACTGGAAAGAATCAAGGAGGCCGACAAAGAGACCTACGTCGAGCAGCACGAGGTGGCTGTGGCCAGATACTGCGACCTCCCTAGCAAACTGGGGCACAAACTTAATTGAGGCGCGCCTCTAGAACTATAGTGAGTCGTATTACGTAGATCCAGACATGATAAGATACATTGATGAGTTTGGACAAACCACAACTAGAATGCAGTGAAAAAAATGCTTTATTTGTGAAATTTGTGATGCTATTGCTTTATTTGTAACCATTATAAGCTGCAATAAACAAGTTAACAACAACAATTGCATTCATTTTATGTTTCAGGTTCAGGGGGAGGTGTGGGAGGTTTTTTCCAACTTTATTATACAAAGTTGGCATTATAAAAAAGCATTGCTTATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTGGAGCTCCATGGTAGCGTTAACGCGGCCGCGATATCCCCTATAGTGAGTCGTATTACATGGTCATAGCTGTTTCCTGGCAGCTCTGGCCCGTGTCTCAAAATCTCTGATGTTACATTGCACAAGATAAAAATATATCATCATGAACAATAAAACTGTCTGCTTACATAAACAGTAATACAAGGGGTGTTATGAGCCATATTCAACGGGAAACGTCGAGGCCGCGATTAAATTCCAACATGGATGCTGATTTATATGGGTATAAATGGGCTCGCGATAATGTCGGGCAATCAGGTGCGACAATCTATCGCTTGTATGGGAAGCCCGATGCGCCAGAGTTGTTTCTGAAACATGGCAAAGGTAGCGTTGCCAATGATGTTACAGATGAGATGGTCAGACTAAACTGGCTGACGGAATTTATGCCTCTTCCGACCATCAAGCATTTTATCCGTACTCCTGATGATGCATGGTTACTCACCACTGCGATCCCCGGAAAAACAGCATTCCAGGTATTAGAAGAATATCCTGATTCAGGTGAAAATATTGTTGATGCGCTGGCAGTGTTCCTGCGCCGGTTGCATTCGATTCCTGTTTGTAATTGTCCTTTTAACAGCGATCGCGTATTTCGTCTCGCTCAGGCGCAATCACGAATGAATAACGGTTTGGTTGATGCGAGTGATTTTGATGACGAGCGTAATGGCTGGCCTGTTGAACAAGTCTGGAAAGAAATGCATAAACTTTTGCCATTCTCACCGGATTCAGTCGTCACTCATGGTGATTTCTCACTTGATAACCTTATTTTTGACGAGGGGAAATTAATAGGTTGTATTGATGTTGGACGAGTCGGAATCGCAGACCGATACCAGGATCTTGCCATCCTATGGAACTGCCTCGGTGAGTTTTCTCCTTCATTACAGAAACGGCTTTTTCAAAAATATGGTATTGATAATCCTGATATGAATAAATTGCAGTTTCATTTGATGCTCGATGAGTTTTTCTAATCAGAATTGGTTAATTGGTTGTAACACTGGCAGAGCATTACGCTGACTTGACGGGACGGCGCAAGCTCATGACCAAAATCCCTTAACGTGAGTTACGCGTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTCCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCATTGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTT")
   })
   
@@ -575,7 +616,7 @@ shinyServer(function(input, output, session) {
     #Reset the inputs that will not be overwritten to their default values
     updateRadioButtons(session, "cDNAtype", selected = 1)
     updateTextInput(session, "geneId", value = "ENSG00000146648")
-    updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGCAGG")
+    updateTextInput(session, "crisprSeq", value = "TGCCACAACCAGTGTGCTGC")
   })
 
   observeEvent(input$exampleGenbank, {
@@ -583,7 +624,7 @@ shinyServer(function(input, output, session) {
     #Reset the inputs to their default values
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateSelectInput(session, "mh", selected = 24)
-    updateTextAreaInput(session, "crisprSeq", value = "CGCTGAAGTTCTACTAAGGGTGG")
+    updateTextAreaInput(session, "crisprSeq", value = "CGCTGAAGTTCTACTAAGGG")
     updateRadioButtons(session, "cDNAtype", selected = 1)
     updateTextInput(session, "genbankId", value = "U49845.1")
     updateRadioButtons(session, "paddingChoice", selected = 1)
@@ -634,5 +675,6 @@ shinyServer(function(input, output, session) {
     })
   }
   
-  
+  #Stop session after browser tab is closed
+  session$onSessionEnded(stopApp)
 })
