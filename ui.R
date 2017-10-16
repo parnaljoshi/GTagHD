@@ -21,7 +21,7 @@ shinyUI(
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("GTagHD v1.0.3", 
+             tags$div("GTagHD v1.0.5", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
