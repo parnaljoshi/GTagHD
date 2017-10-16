@@ -190,17 +190,18 @@ shinyUI(
                         wellPanel(
                           #Buttons to choose cDNAtype; input$cDNAtype
                           radioButtons("cDNAtype", 
-                                       label = "3. Specify the target gene of interest in the form of a GenBank accession number, or copy/paste the gene sequence.", 
+                                       label = "3. Specify the target gene of interest in the form of a GenBank accession number (ENSEMBL support coming soon), or copy/paste the gene sequence.", 
                                        choices = list("GenBank Gene ID" = 1,
                                                       #"ENSEMBL Gene ID" = 3,
                                                       "Pasted cDNA" = 2), 
                                        selected = 1),
-                          p("ENSEMBL gene ID support coming soon."),
+                          
                           #####cDNAtype == GENBANK ID####
                           conditionalPanel(
                             condition = "input.cDNAtype == 1",
                             
                             p("Paste GenBank Accession here. If the entry matching your accession number does not have exon location information, automatic 'padding' nucleotide generation is not possible."),
+                            p("This feature is still under development. Certain GenBank sequences will cause the application to crash due to a formatting conflict. A fix is under development."),
                             #Space to output validated gene ID; output$validgeneid
                             textOutput("validgenbankid"),
                             
