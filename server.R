@@ -13,12 +13,13 @@ library(shinyjs)
 library(stringr)
 library(plyr)
 #library(biomaRt)
-library(rentrez)
+#library(rentrez)
 library(genbankr)
-library(biofiles)
+#library(biofiles)
 
 #Required files
 source("functions.R")
+source("apeShiftFunctions.R")
 
 shinyServer(function(input, output, session) {
   
@@ -243,6 +244,7 @@ shinyServer(function(input, output, session) {
   exonWarningFunc <- reactive({
     if(!is.null(gbFile) && input$genbankId != "" && !is.null(input$genbankId)){
       gba = readGenBank(text = gbFile, partial = TRUE)
+      print(exons(gba))
       if(length(exons(gba)) < 1){
         "Warning: This GenBank record does not have annotated exon information. Automatic padding generation is disabled."
         updateRadioButtons(session, "paddingChoice", selected = 2)
@@ -373,19 +375,49 @@ shinyServer(function(input, output, session) {
       gba <- GBAccession(input$genbankId)
       
       endOfTry <- FALSE
+      gbFlag   <- FALSE
+      gbhFlag  <- FALSE
       
-      #Try to get the accession info
-      tryCatch({
-        info <- readGenBank(gba, partial = TRUE, verbose = FALSE)
+      #Try to get the accession info - working
+      #tryCatch({
+      #  info <- readGenBank(gba, partial = TRUE, verbose = FALSE)
         
-        endOfTry <- TRUE
+      #  endOfTry <- TRUE
+      #}, error = function(err){
+        
+       # output$validgenbankid <- renderText({
+       #   validGenbankId()
+        #})
+      #})
+      
+      #Experimental try-catch to deal with exon/cds files
+      info <- tryCatch({
+        gbInfo <- readGenBank(gba, partial = TRUE, verbose = TRUE)
+        
+        endOfTry <<- TRUE
+        gbFlag   <<- TRUE #Flag to indicate readGenBank succeeded
+        return(gbInfo)
       }, error = function(err){
-        output$validgenbankid <- renderText({
-          validGenbankId()
-        })
+        tryCatch({
+          print("We got to this point")
+          gbInfo <- suppressWarnings(wonkyGenBankHandler(gba))
+          
+          endOfTry <<- TRUE
+          gbhFlag  <<- TRUE  #Flag to indicate wonkyGenBankHandler was required
+          gbFlag   <<- FALSE #Flag to indicate readGenBank failed
+          return(gbInfo)
+        }, error = function(err){
+            output$validgenbankid <- renderText({
+              validGenbankId()
+            })
+          }
+        )
+
       })
       
-      
+      print(endOfTry)
+      print(gbFlag)
+      print(gbhFlag)
       
       #Only executes if GenBank ID is valid
       if(endOfTry){
@@ -397,14 +429,23 @@ shinyServer(function(input, output, session) {
         
         progress$set(detail = "Searching for target in GenBank sequence...", value = 0.2)
         
-        #Search for CRISPR in input sequence
-        geneSeq <- as.character(info@sequence)
+        if(gbFlag){
+          #Search for CRISPR in input sequence
+          geneSeq <- as.character(info@sequence)
+        } else {
+          geneSeq <- as.character(info$ORIGIN)
+        }
         
-        #Count how many times the input CRISPR target sequence appears in the exon sequence in the FORWARD direction
+        
+        #Count how many times the input CRISPR target sequence appears in the sequence in the FORWARD direction
         count <- str_count(geneSeq, uCS)
         
+        print(paste0("Forward Count: ", count))
+        
         #Count the instance in the reverse complement of the sequence
-        revCount <- str_count(reverseComplement(geneSeq), uCS)
+        revCount <- str_count(geneSeq, reverseComplement(uCS))
+        
+        print(paste0("Reverse Count: ", revCount))
         
         #Kicks an error if CRISPR occurs multiple times in sequence
         if(revCount > 1 || count > 1 || (revCount == 1 && count == 1)){
@@ -423,37 +464,61 @@ shinyServer(function(input, output, session) {
                    "Error: CRISPR target does not appear in the sequence associated with this GenBank Accession ID.")
             )
           })
+          
         } else {
+          print("Passed those checks")
           #If CRISPR appears exactly once in sequence:
           ucDNA <- toupper(geneSeq)
           
           #Determine whether CRISPR is in forward or reverse strand
           if(revCount == 1 && count == 0){
-            uDNA <- reverseComplement(ucDNA)
+            #uDNA <- reverseComplement(ucDNA)
             revFlag <- TRUE
           } else {
-            uDNA <- ucDNA
+            #uDNA <- ucDNA
             revFlag <- FALSE
           } 
+          uDNA <- ucDNA
           
+          print("Got past forward or reverse strand...")
           orientation <- input$sense
             
           progress$set(detail = "Identifying exons...", value = 0.3)
           
-          #Get exons from GenBank sequence
-          gbExonsLoci <- info@exons@ranges
+          if(gbFlag){
+            #Get exons from GenBank sequence
+            gbExonsLoci <- info@exons@ranges
+          } else {
+            
+            gbExonsLoci <- getExonLocus(info)
+          }
           
-          gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
+          print("Got past exon locus")
           
-          cutI <- getGenomicCutSite(ucDNA, input$crisprSeq, orientation)
           
-          #Find the exon that the cut occurs in
-          exon <- IRanges:::findOverlaps(IRanges:::IRanges(cutI, cutI), info@exons@ranges, type = "within", select = "first")
+          #gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
+          
+          cutI <- getGenomicCutSite(ucDNA, uCS, orientation)
+          
+          if(gbFlag){
+            #Find the exon that the cut occurs in
+            exon <- IRanges:::findOverlaps(IRanges:::IRanges(cutI, cutI), gbExonsLoci, type = "within", select = "first")
+          } else {
+            exon <- gbExonsLoci[(cutI >= gbExonsLoci$start) & (gbExonsLoci$stop > cutI),]
+          }
+          
+          print("Found the cut site")
           
           progress$set(detail = "Generating padding...", value = 0.4)
           
-          #Find how many nucleotides are between the start of the exon and the cut site
-          nucs <- cutI - start(info@exons@ranges[exon]) + 1
+          if(gbFlag){
+            #Find how many nucleotides are between the start of the exon and the cut site
+            nucs <- cutI - info@exons@ranges[exon]@start + 1
+          } else {
+            nucs <- cutI - as.numeric(exon$start[1]) + 1
+          }
+          
+          print(paste0("Nucs: ", nucs))
           
           if(nucs %% 3 == 0){
             padNum <- 0
@@ -464,6 +529,7 @@ shinyServer(function(input, output, session) {
           #Determine number of padding nucleotides
           #padNum <- getGenBankPadding(info, uCS, exon, orientation)
           
+          print(paste0("PadNum: ", padNum))
           #Create the oligos
           if(input$paddingChoice == 1){
             oligos <<- doCalculations(uDNA, 
