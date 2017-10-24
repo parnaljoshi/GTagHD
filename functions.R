@@ -23,7 +23,7 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
   #' Determine the location of the CRISPR cut site in the cDNA sequence:
   cutSite <- getGenomicCutSite(toupper(dnaSeq), toupper(crisprSeq), orientation)
   #' Construct oligos correctly if reverse flag has been applied
-  if(revFlag == FALSE){
+  if(!revFlag){
     progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
     fiveData <- get5Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
@@ -122,8 +122,11 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding){
   return(c(fivePrimeF, fivePrimeR))
 }
 
-get5PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding){
-  homology <- substring(dnaSeq, cutSite + 1, cutSite + mh)
+get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding){
+  
+  
+  
+  homology <- substring(dnaSeq, cutSite - 1, cutSite + mh)
   spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
   nhSpacer <- addNonHBP(spacer)
   
@@ -182,7 +185,7 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
   
 }
 
-get3PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite){
+get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite){
   #Get the homologous section from the genome
   homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
   #Get the next three nucleotides
@@ -664,3 +667,11 @@ getGenBankPadding <- function(uDNA, uCS, orientation){
   }
 }
 
+#For handling GenBank files that throw errors
+wonkyGenBankHandler <- function(gba){
+  gbFile <- rentrez:::entrez_fetch(db = "nucleotide", gba, rettype = "gb") 
+  geneIn <- unlist(strsplit(gbFile, "\\\n", perl = TRUE))
+  
+  geneInfo <- formatApe(geneIn)
+  return(geneInfo)
+}
