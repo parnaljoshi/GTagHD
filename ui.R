@@ -21,7 +21,7 @@ shinyUI(
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("GTagHD v1.0.5", 
+             tags$div("GTagHD v1.0.6", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
@@ -201,7 +201,7 @@ shinyUI(
                             condition = "input.cDNAtype == 1",
                             
                             p("Paste GenBank Accession here. If the entry matching your accession number does not have exon location information, automatic 'padding' nucleotide generation is not possible."),
-                            p("This feature is still under development. Certain GenBank sequences will cause the application to crash due to a formatting conflict. A fix is under development."),
+                            #p("This feature is still under development. Certain GenBank sequences will cause the application to crash due to a formatting conflict. A fix is in development."),
                             #Space to output validated gene ID; output$validgeneid
                             textOutput("validgenbankid"),
                             
@@ -413,67 +413,168 @@ shinyUI(
                column(9, wellPanel(
                       p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
                ),
-                      wellPanel(
+               wellPanel(
                  #p("Download standalone version, or other stuff."),
                  
                  h1("Download G-Series Plasmid Sequences"),
                  
-                 p(tags$a(href     = 'plasmids/062917_gseries_plasmids.zip', 
-                          target   = 'blank', 
-                          'Download all plasmids', 
-                          download = '062917_gseries_plasmids.zip')),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).ape',
-                          target   = 'blank', 
-                          "pGTag-eGFP-B-actin_(062917)", 
-                          download = "pGTag-eGFP-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-eGFP-caax-B-actin_(062917)", 
-                          download = "pGTag-eGFP-caax-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-eGFP-caax-SV40_(062917)", 
-                          download = "pGTag-eGFP-caax-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-eGFP-B-actin_(062917)", 
-                          download = "pGTag-eGFP-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-Gal4-VP16-B-actin_(062917)", 
-                          download = "pGTag-Gal4-VP16-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-eGFP-B-actin_(062917)", 
-                          download = "pGTag-NLS-eGFP-B-actin_(062917)).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-eGFP-SV40_(062917)", 
-                          download = "pGTag-NLS-eGFP-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-TagRFP-B-actin_(062917)", 
-                          download = "pGTag-NLS-TagRFP-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-TagRFP-SV40_(062917)", 
-                          download = "pGTag-NLS-TagRFP-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-TagRFP-B-actin_(062917)", 
-                          download = "pGTag-TagRFP-B-actin_(062917).ape")),
-                 p(tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).ape', 
-                          target = 'blank', 
-                          "pGTag-TagRFP-caax-B-actin_(062917)", 
-                          download = "pGTag-TagRFP-caax-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-TagRFP-caax-SV40_(062917)", 
-                          download = "pGTag-TagRFP-caax-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-TagRFP-SV40_(062917)", 
-                          download = "pGTag-TagRFP-SV40_(062917).ape"))
+                 tags$p("Download all plasmids in ", 
+                        tags$a(href     = 'plasmids/062917_gseries_plasmids_gb.zip', 
+                               target   = 'blank', 
+                               'GenBank', 
+                               download = '062917_gseries_plasmids_gb.zip'),
+                        " format or ",
+                        tags$a(href     = 'plasmids/062917_gseries_plasmids_ape.zip', 
+                               target   = 'blank', 
+                               'ApE', 
+                               download = '062917_gseries_plasmids_ape.zip'),
+                        " format"),
+                 tags$p("Or download individual plasmids: "),
+                 tags$p("pGTag-eGFP-B-actin_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).gb',
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).ape',
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-B-actin_(062917).ape")
+                        
+                 ),
+                 
+                 tags$p("pGTag-eGFP-caax-B-actin_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-caax-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-caax-B-actin_(062917).ape")
+                        
+                 ),
+                 
+                 tags$p("pGTag-eGFP-caax-SV40_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-caax-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-caax-SV40_(062917).ape")
+                        
+                 ),
+                 
+                 tags$p("pGTag-eGFP-B-actin_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-Gal4-VP16-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-Gal4-VP16-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-Gal4-VP16-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-NLS-eGFP-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-eGFP-B-actin_(062917)).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-eGFP-B-actin_(062917)).ape")
+                 ),
+                 
+                 tags$p("pGTag-NLS-eGFP-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-eGFP-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-eGFP-SV40_(062917).ape")
+                 ),
+                 tags$p("pGTag-NLS-TagRFP-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-TagRFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-TagRFP-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-NLS-TagRFP-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-TagRFP-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-TagRFP-SV40_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-caax-B-actin_(062917)",
+                        tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).gb', 
+                               target = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-caax-B-actin_(062917).gb"),
+                        tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).ape', 
+                               target = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-caax-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-caax-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-caax-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-caax-SV40_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-SV40_(062917).ape")
+                 )
+                 
                ))
                
              ),
