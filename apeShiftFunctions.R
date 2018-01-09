@@ -288,4 +288,52 @@ getExonLocus <- function(gene){
 
 
 
+apeShift <- function(plasmid1, oligos){
+  plasmid <- plasmid1
+  #Get the oligos that will eventually be inserted into the plasmid
+  oligo5F <- oligos[1]
+  oligo5R <- oligos[2]
+  oligo3F <- oligos[3]
+  oligo3R <- oligos[4]
+  
+  #Find where the overhangs in the plasmid are
+  uniGuideSites <- findUniGuideSites(plasmid$FEATURES)
+  
+  #Get the index values of all the locations of the overhangs
+  fiveS  <- as.numeric(plasmid$FEATURES[[uniGuideSites[1]]][2, 2])
+  fiveE  <- as.numeric(plasmid$FEATURES[[uniGuideSites[2]]][3, 2])
+  threeS <- as.numeric(plasmid$FEATURES[[uniGuideSites[3]]][2, 2])
+  threeE <- as.numeric(plasmid$FEATURES[[uniGuideSites[4]]][3, 2])
+  
+  #Find all overlapping features, and delete them
+  
+  
+  #Remove overlapping sequence from origin
+  substring(plasmid$ORIGIN, fiveS, fiveE) <- ""
+  substring(plasmid$ORIGIN, threeS, threeE) <- ""
+  
+  #Find and adjust features that are downstream of the whole thing, which will need to be re-indexed
+  downstreamF    <- which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) > fiveE)
+  downstreamBoth <- which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) > threeE)
+  
+  for(i in downstreamF){
+    plasmid$FEATURES[[i]][[2]][[2]] <- plasmid$FEATURES[[i]][[2]][[2]] - (fiveE - fiveS + 1) + nchar(oligo5F)
+    plasmid$FEATURES[[i]][[2]][[3]] <- plasmid$FEATURES[[i]][[2]][[3]] - (fiveE - fiveS + 1) + nchar(oligo5F)
+  }
+  
+  for(j in downstreamBoth){
+    plasmid$FEATURES[[j]][[2]][[2]] <- plasmid$FEATURES[[j]][[2]][[2]] - (threeE - threeS + 1) + nchar(oligo3F)
+    plasmid$FEATURES[[j]][[2]][[3]] <- plasmid$FEATURES[[j]][[2]][[3]] - (threeE - threeS + 1) + nchar(oligo3F)
+  }
+
+  
+  #Find features that overlap with the deleted sections; need to figure out what to do with these...
+  #frontOverlapF <- kj
+  #frontoverlapT <- kj
+  #backOverlapF  <- kj
+  #backOverlapT  <- k
+  
+  
+  return(plasmid)
+}
 
