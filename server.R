@@ -13,8 +13,9 @@ library(shinyjs)
 library(stringr)
 library(plyr)
 #library(biomaRt)
-#library(rentrez)
-library(genbankr)
+library(rentrez)
+library(rlist)
+#library(genbankr)
 #library(biofiles)
 
 #Required files
@@ -122,7 +123,7 @@ shinyServer(function(input, output, session) {
         #Check to ensure the target only appears once in a single direction
         if(count > 1){
           validate(
-            need(count == 1, paste0("Error: CRISPR target sequence appears ", count, " times in the cDNA.")),
+            need(count == 1, paste0("Error: CRISPR target sequence appears ", count, " times in the pasted gene/exon sequence.")),
             
             need(revCount == 0, paste0("Error: The CRISPR target sequence appears ", 
                                        revCount, 
@@ -152,6 +153,11 @@ shinyServer(function(input, output, session) {
           need(input$cDNA != "", "")
         )
       }
+    } else {
+      #Prevent further empty crashing
+      validate(
+        need(input$cDNA != "", "")
+      )
     }
       
       
@@ -204,12 +210,12 @@ shinyServer(function(input, output, session) {
           validate(
             #Check to make sure that the microhomology length won't run off the beginning of the sequence
             need(cutIndex - as.numeric(input$mh) >= 0, 
-                 paste0("Error: Microhomology length is too long for this CRISPR target sequence and cDNA pairing. ",
-                        "Choose a smaller homology length.")),
+                 paste0("Error: Microhomology length is too long for this CRISPR target sequence and pasted gene/exon sequence pairing. ",
+                        "Choose a smaller homology length, or provide more sequence context starting from the beginning of the sequence.")),
             #Check to make sure that the microhomology length won't run off the end of the sequence
             need(nchar(uDNA) - as.numeric(input$mh) >= cutIndex,
-                 paste0("Error: Microhomology length is too long for this CRISPR target sequence and cDNA pairing. ",
-                        "Choose a smaller homology length."))
+                 paste0("Error: Microhomology length is too long for this CRISPR target sequence and pasted gene/exon sequence pairing. ",
+                        "Choose a smaller homology length, or provide more sequence context at the end of the sequence."))
           )
         } 
       }
@@ -243,43 +249,38 @@ shinyServer(function(input, output, session) {
   
   validRefSeqGBGenbankId <- reactive({
     if(input$genbankId != ""){
-      if((attr(regexpr("^(NM|NR|XM|XR)_[0-9]{6}", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1)){
+      if(stringr::str_detect(input$genbankId, regex("^(NM|NR|XM|XR)_[0-9]{6}", ignore_case = TRUE))){
         validate(
-        need(1 == 2,
-             "Error: This ID matches RefSeq RNA accession format. Please submit an accession corresponding to a DNA sequence."))
+          need(1 == 2,
+               "Error: This ID matches RefSeq RNA accession format. Please submit an accession corresponding to a DNA sequence."))
         
-      } else if((attr(regexpr("^(AP|NP|YP|XP|WP)_[0-9]{6}", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1)){
+      } else if(stringr::str_detect(input$genbankId, regex("^(AP|NP|YP|XP|WP)_[0-9]{6}", ignore_case = TRUE))){
         validate(
-        need(1 == 2,
-             "Error: This ID matches RefSeq protein accession format. Please submit an accession corresponding to a DNA sequence."))
+          need(1 == 2,
+               "Error: This ID matches RefSeq protein accession format. Please submit an accession corresponding to a DNA sequence."))
         
-      } else if((attr(regexpr("^[A-Z]{3}[0-9]{5}", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1)){
+      } else if(stringr::str_detect(input$genbankId, regex("^[A-Z]{3}[0-9]{5}", ignore_case = TRUE))){
         validate(
-        need(1 == 2,
-             "Error: This ID matches GenBank protein accession format. Please submit an accession corresponding to a DNA sequence."))
+          need(1 == 2,
+               "Error: This ID matches GenBank protein accession format. Please submit an accession corresponding to a DNA sequence."))
         
       } else {
         validate(
-        need((((attr(regexpr("^[a-z]{2}[0-9]{6}", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1) | 
-                (attr(regexpr("^[a-z]{1}[0-9]{5}", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1)) |
-               (attr(regexpr("^(AC|NC|NG|NT|NW|NZ)_[0-9]{6}\\.[0-9]", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1)) |
-               (attr(regexpr("^[a-z]{4}[0-9]{8,10}", input$genbankId, ignore.case = TRUE, perl = TRUE), "match.length") != -1),
-             
-             "Error: The entered ID does not match a known Genbank NUCLEOTIDE or RefSeq NUCLEOTIDE ID format. Please check your submitted accession."))
+          need((((stringr::str_detect(input$genbankId, regex("^[a-zA-Z]{2}[0-9]{6}", ignore_case = TRUE))) | 
+                   (stringr::str_detect(input$genbankId, regex("^[a-zA-Z]{1}[0-9]{5}", ignore_case = TRUE)))) |
+                  (stringr::str_detect(input$genbankId, regex("^(AC|NC|NG|NT|NW|NZ)_[0-9]{6}\\.[0-9]", ignore_case = TRUE)))) |
+                 (stringr::str_detect(input$genbankId, regex("^[a-zA-Z]{4}[0-9]{8,10}", ignore_case = TRUE))),
+               
+               "Error: The entered ID does not match a known Genbank NUCLEOTIDE or RefSeq NUCLEOTIDE ID format. Please check your submitted accession to make sure you are using a NUCLEOTIDE entry."))
       }
-    } else {
-      validate(
-        need(1 == 2, "")
-      )
     }
-    
   })
+  
   
   #Function to determine if Genbank input has valid exon info
   exonWarningFunc <- reactive({
     if(!is.null(gbFile) && input$genbankId != "" && !is.null(input$genbankId)){
       gba = readGenBank(text = gbFile, partial = TRUE)
-      print(exons(gba))
       if(length(exons(gba)) < 1){
         "Warning: This GenBank record does not have annotated exon information. Automatic padding generation is disabled."
         updateRadioButtons(session, "paddingChoice", selected = 2)
@@ -347,7 +348,8 @@ shinyServer(function(input, output, session) {
     #Check to ensure that all inputs are valid before accepting
     if(is.null(validgRNA()) &&
        is.null(validCrisprSeq()) &&
-       is.null(validCDNA())){
+       is.null(validCDNA()) &&
+       is.null(validMHCDna())){
       revFlag <- FALSE
       resetOutputs()
       
@@ -381,11 +383,9 @@ shinyServer(function(input, output, session) {
       progress$set(detail = "Done", value = 1)
       
       #Flag the download button so that it becomes visible
-      dF$downloadF <<- TRUE
+      dF$downloadF  <<- TRUE
+      dFF$downloadF <<- TRUE
       
-      if(input$gTagTF == 1){
-        dFF$downloadF <<- TRUE
-        }
       
       #Output the oligos
       printOutputs(oligos)
@@ -416,7 +416,8 @@ shinyServer(function(input, output, session) {
       #Try to pull genbank entry associated with accession
       #Get the GenBank sequence with exon/intron information
       #Make a genbank acession object
-      gba <- genbankr:::GBAccession(input$genbankId)
+      #gba <- genbankr:::GBAccession(input$genbankId)
+      gba <- input$genbankId
       
       endOfTry <<- FALSE
       gbFlag   <<- FALSE
@@ -434,24 +435,8 @@ shinyServer(function(input, output, session) {
         #})
       #})
       
-      
-      
-      #Experimental try-catch to deal with exon/cds files
-      tryCatch({
-        info <- readGenBank(gba, partial = TRUE, verbose = TRUE)
-        
-        endOfTry <<- TRUE
-        gbFlag   <<- TRUE #Flag to indicate readGenBank succeeded
-        
-      }, error = function(err){
-        endOfTry <<- FALSE
-
-      }
-      )
-      
       if(endOfTry == FALSE){
         tryCatch({
-          #print("We got to this point") #Bughunting
           info <- suppressWarnings(wonkyGenBankHandler(gba))
           
           endOfTry <<- TRUE
@@ -465,14 +450,6 @@ shinyServer(function(input, output, session) {
         )
       }
 
-      
-      
-      #print(endOfTry) #Bughunting
-      #print(info)
-      print(str(info))
-      #print(gbFlag)
-      #print(gbhFlag)
-      
       #Only executes if GenBank ID is valid
       if(endOfTry){
         #Convert CRISPR seq to upper case
@@ -483,27 +460,19 @@ shinyServer(function(input, output, session) {
         
         progress$set(detail = "Searching for target in GenBank sequence...", value = 0.2)
         
-        #print("Here I am once again...") #Bughunting
-        #print(str(info))
-        
         if(gbFlag){
           #Search for CRISPR in input sequence
-          geneSeq <- as.character(info@sequence)
+          geneSeq <- toupper(as.character(info@sequence))
         } else {
           
-          geneSeq <- as.character(info$ORIGIN)
+          geneSeq <- toupper(as.character(info$ORIGIN))
         }
         
-        #print("But not here") #Bughunting
         #Count how many times the input CRISPR target sequence appears in the sequence in the FORWARD direction
         count <- str_count(geneSeq, uCS)
         
-        #print(paste0("Forward Count: ", count)) #Bughunting
-        
         #Count the instance in the reverse complement of the sequence
         revCount <- str_count(geneSeq, reverseComplement(uCS))
-        
-        #print(paste0("Reverse Count: ", revCount)) #Bughunting
         
         #Kicks an error if CRISPR occurs multiple times in sequence
         if(revCount > 1 || count > 1 || (revCount == 1 && count == 1)){
@@ -524,7 +493,6 @@ shinyServer(function(input, output, session) {
           })
           
         } else {
-          #print("Passed those checks") #Bughunting
           #If CRISPR appears exactly once in sequence:
           ucDNA <- toupper(geneSeq)
           
@@ -538,7 +506,6 @@ shinyServer(function(input, output, session) {
           } 
           uDNA <- ucDNA
           
-          #print("Got past forward or reverse strand...") #Bughunting
           orientation <- input$sense
             
           progress$set(detail = "Identifying exons...", value = 0.3)
@@ -551,11 +518,6 @@ shinyServer(function(input, output, session) {
             gbExonsLoci <- getExonLocus(info)
           }
           
-          #print("Got past exon locus") #Bughunting
-          
-          
-          #gbExons <- substring(geneSeq, gbExonsLoci@start, gbExonsLoci@start + gbExonsLoci@width - 1)
-          
           cutI <- getGenomicCutSite(ucDNA, uCS, orientation)
           
           if(gbFlag){
@@ -564,9 +526,7 @@ shinyServer(function(input, output, session) {
           } else {
             exon <- gbExonsLoci[(cutI >= gbExonsLoci$start) & (gbExonsLoci$stop > cutI),]
           }
-          
-          #print("Found the cut site") #Bughunting
-          
+
           progress$set(detail = "Generating padding...", value = 0.4)
           
           if(gbFlag){
@@ -576,8 +536,6 @@ shinyServer(function(input, output, session) {
             nucs <- cutI - as.numeric(exon$start[1]) + 1
           }
           
-          #print(paste0("Nucs: ", nucs)) #Bughunting
-          
           if(nucs %% 3 == 0){
             padNum <- 0
           } else {
@@ -585,9 +543,7 @@ shinyServer(function(input, output, session) {
           }
           
           #Determine number of padding nucleotides
-          #padNum <- getGenBankPadding(info, uCS, exon, orientation)
           
-          #print(paste0("PadNum: ", padNum)) #Bughunting
           #Create the oligos
           if(input$paddingChoice == 1){
             oligos <<- doCalculations(uDNA, 
@@ -608,8 +564,13 @@ shinyServer(function(input, output, session) {
                                       input$sense,
                                       progress)
           }
+          
+          
+          
           progress$set(detail = "Done", value = 1)
           dF$downloadF <<- TRUE
+          dFF$downloadF <<- TRUE
+          
           printOutputs(oligos)
         }
       }
@@ -627,7 +588,8 @@ shinyServer(function(input, output, session) {
     
     if(is.null(validgRNA()) &&
        is.null(validCrisprSeq()) &&
-       is.null(validGeneId())){
+       is.null(validGeneId()) &&
+       is.null(validRefSeqGBGenbankId())){
       
       setProgress(message = "Identifying Species...")
       species <- getEnsemblSpecies(toupper(input$geneId))
@@ -647,7 +609,8 @@ shinyServer(function(input, output, session) {
       
       setProgress(message = "Done!")
       
-      dF$downloadF <<-TRUE
+      dF$downloadF  <<-TRUE
+      dFF$downloadF <<- TRUE
       
       printOutputs(oligos)
     }
@@ -688,10 +651,17 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  output$downPlasOut <- renderUI({
+    if(dFF$downloadF){
+      downloadButton("downPlasmid", "Download Plasmid File")
+    } else {
+      ""
+    }
+  })
   ####Function to handle file generation for downloading oligos
   output$downOligos <- downloadHandler(
     filename = function(){
-      paste(gsub("CDT", "", gsub(" ", "_", Sys.time())), "_oligos.txt")},
+      paste0(gsub("CDT", "", gsub(" ", "_", Sys.time())), "_oligos.txt")},
     
     content = function(file){
       cat(paste0("5' Forward Oligo: ", oligos[1]), file = file, sep = "\n", append = TRUE)
@@ -703,14 +673,20 @@ shinyServer(function(input, output, session) {
   )
   
   output$downPlasmid <- downloadHandler(
+
     filename = function(){
-      paste(gsub("CDT", "", gsub(" ", "_", Sys.time())), "_", input$plasmidName, ".gb")
+      paste0(gsub("CDT", "", gsub(" ", "_", Sys.time())), "_", basename(getBasePlasmid(as.numeric(input$plasmidName))))
     },
     
     content = function(file){
-      
+      inPlas <- readLines(getBasePlasmid(as.numeric(input$plasmidName)))
+      readPlas <- formatApe(inPlas)
+      incPlas <- apeShift(readPlas, oligos)
+      writeApe(incPlas, file)
     }
   )
+  
+  
   
   #output$downloadFlag <- observeEvent(downloadF, {
   #  downloadF
@@ -758,9 +734,9 @@ shinyServer(function(input, output, session) {
     #Reset the inputs to their default values
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateSelectInput(session, "mh", selected = 24)
-    updateTextAreaInput(session, "crisprSeq", value = "CGCTGAAGTTCTACTAAGGG")
+    updateTextAreaInput(session, "crisprSeq", value = toupper("ggaagagcttacgaaactta"))
     updateRadioButtons(session, "cDNAtype", selected = 1)
-    updateTextInput(session, "genbankId", value = "U49845.1")
+    updateTextInput(session, "genbankId", value = "AY214391.1")
     updateRadioButtons(session, "paddingChoice", selected = 1)
     
     
@@ -771,6 +747,7 @@ shinyServer(function(input, output, session) {
     
     #Reset the global inputs to their default values
     dF$downloadF <<- FALSE
+    dFF$downloadF <<- FALSE
     oligos <<- NULL
     gbFile <<- NULL
     
@@ -778,7 +755,8 @@ shinyServer(function(input, output, session) {
     updateRadioButtons(session, "gRNAtype", selected = 1)
     updateTextInput(session, "gRNA", value = NA)
     updateTextInput(session, "crisprSeq", value = NA)
-    updateRadioButtons(session, "cDNAtype", selected = 2)
+    updateRadioButtons(session, "sense", selected = 0)
+    updateRadioButtons(session, "cDNAtype", selected = 1)
     updateTextInput(session, "cDNA", value = NA)
     updateTextInput(session, "genbankId", value = NA)
     updateRadioButtons(session, "paddingChoice", selected = 1)
@@ -786,6 +764,8 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session, "mh", selected = 48)
     updateSelectInput(session, "padding", selected = 0)
     updateTextInput(session, "geneId", value = NA)
+    updateSelectInput(session, "plasmidName", selected = 1)
+    
     resetOutputs()
   }
   
