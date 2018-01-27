@@ -21,7 +21,7 @@ shinyUI(
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("GTagHD v1.0.7", 
+             tags$div("GTagHD v1.0.10", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
@@ -30,12 +30,12 @@ shinyUI(
                       
                       #Sidebar panel with links
                       column(2, wellPanel(
-                        tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                        p(""),
+                        tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                        tags$br(),
                         tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                        p(""),
+                        tags$br(),
                         tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                        p(""),
+                        tags$br(),
                         tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
                                              target = "_blank", 
                                              tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
@@ -43,7 +43,7 @@ shinyUI(
                       
                       #Text area in center of page
                       column(9, wellPanel(
-                        p("")
+                        includeHTML("www/about.html")
                       ))
                       
              ),
@@ -54,12 +54,12 @@ shinyUI(
                       
                       #Sidebar panel with links
                       column(2, wellPanel(
-                        tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                        p(""),
+                        tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                        tags$br(),
                         tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                        p(""),
+                        tags$br(),
                         tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                        p(""),
+                        tags$br(),
                         tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
                                              target = "_blank", 
                                              tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
@@ -83,9 +83,9 @@ shinyUI(
                       #Adds a sidebar for users to pre-populate fields with an example, and reset the form
                       column(2, wellPanel(
                         
-                        #Cut/Paste cDNA example; input$example
+                        #Cut/Paste gene/exon example; input$example
                         actionLink("example", 
-                                   label = "Example"),
+                                   label = "Pasted Sequence Example"),
                         
                         p(""),
                         
@@ -110,34 +110,6 @@ shinyUI(
                       #Main panel for entering information and submitting job
                       column(9, wellPanel(
                         
-                        ############Plasmid selection section##############################
-                        #Plasmid Instructions
-                        #p(paste0("0. Do you want to use a pGTag Series plasmid?")),
-                        #radioButtons("plasmidCond",
-                        #             label = "",
-                        #             choices = list("Yes" = 1,
-                        #                            "No"  = 0),
-                        #             selected = 0),
-                        #
-                        #conditionalPanel(condition = "input.plasmidCond == '1'",
-                        #                 selectInput("plasmidType",
-                        #                             label = "",
-                        #                             choices = list("None" = 0,
-                        #                                            "pGTag-eGFP-B-actin_(062917)" = 1,
-                        #                                            "pGTag-eGFP-caax-B-actin_(062917)" = 2,
-                        #                                            "pGTag-eGFP-caax-SV40_(062917)" = 3,
-                        #                                            "pGTag-eGFP-SV40_(062917)" = 4,
-                        #                                            "pGTag-Gal4-VP16-B-actin_(062917)" = 5,
-                        #                                            "pGTag-NLS-eGFP-B-actin_(062917)" = 6,
-                        #                                            "pGTag-NLS-eGFP-SV40_(062917)" = 7,
-                        #                                            "pGTag-NLS-TagRFP-B-actin_(062917)" = 8,
-                        #                                            "pGTag-NLS-TagRFP-SV40_(062917)" = 9,
-                        #                                            "pGTag-TagRFP-B-actin_(062917)" = 10,
-                        #                                            "pGTag-TagRFP-caax-B-actin_(062917)" = 11,
-                        #                                            "pGTag-TagRFP-caax-SV40_(062917)" = 12,
-                        #                                            "pGTag-TagRFP-SV40_(062917)" = 13))
-                        #                 
-                        #),
                         ############Guide RNA selection section############################ 
                         #Guide RNA instructions
                         #Buttons to select input$gRNAtype
@@ -194,26 +166,25 @@ shinyUI(
                                                    "anti-sense" = 1),
                                        selected = 0,
                                        inline = TRUE)
-                          
-                          ###########cDNA/Gene ID Section####################################
-                          #Gene ID/cDNA instructions
-                          #p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
-                          #         "the box in PLAIN TEXT format (no FASTA header).")),
                         ),
+                        
+                        
+                        ###########gene/Gene ID Section####################################
+                        #Gene ID/geneinstructions
                         wellPanel(
                           #Buttons to choose cDNAtype; input$cDNAtype
                           radioButtons("cDNAtype", 
                                        label = "3. Specify the target gene of interest in the form of a GenBank accession number (ENSEMBL support coming soon), or copy/paste the gene sequence.", 
                                        choices = list("GenBank Gene ID" = 1,
                                                       #"ENSEMBL Gene ID" = 3,
-                                                      "Pasted cDNA" = 2), 
+                                                      "Pasted gene/exon sequence" = 2), 
                                        selected = 1),
                           
                           #####cDNAtype == GENBANK ID####
                           conditionalPanel(
                             condition = "input.cDNAtype == 1",
                             
-                            p("Paste GenBank Accession here. If the entry matching your accession number does not have exon location information, automatic 'padding' nucleotide generation is not possible."),
+                            p("Paste GenBank Accession here. If the entry matching your accession number does not have exon location information, automatic codon repair is not possible."),
                             #p("This feature is still under development. Certain GenBank sequences will cause the application to crash due to a formatting conflict. A fix is in development."),
                             #Space to output validated gene ID; output$validgeneid
                             textOutput("validgenbankid"),
@@ -229,7 +200,7 @@ shinyUI(
                             
                             textOutput("exonWarning"),
                             
-                            p("Do you want to generate 'padding' nucleotides to repair a codon break?"),
+                            p("Do you want to generate nucleotides to repair a codon break?"),
                             radioButtons("paddingChoice",
                                          label    = "",
                                          choices  = list("Yes" = 1,
@@ -247,7 +218,6 @@ shinyUI(
                             
                             #Space to output validated gene ID; output$validgeneid
                             textOutput("validgeneid"),
-                            
                             
                             #Box to paste gene ID; input$geneId
                             textInput("geneId", 
@@ -272,13 +242,13 @@ shinyUI(
                             textAreaInput("cDNA", 
                                           label = "", 
                                           value = "", 
-                                          placeholder = "Paste cDNA sequence here...", 
+                                          placeholder = "Paste gene/exon sequence here...", 
                                           rows = 6),
                             
                             #Padding Selection ################
                             #This panel displays if the user knows how many padding nucleotides to put in
                             #Instructions
-                            p("Please select the number of 'padding' nucleotides to repair codon changes."),
+                            p("Please select the number of additional nucleotides required to maintain the reading frame."),
                             
                             #Selection drop-down box; input$padding
                             selectInput("padding", 
@@ -320,33 +290,26 @@ shinyUI(
                           )),
                         
                         ######################Plasmid Selection section#######################
-                        #wellPanel(
-                        #  radioButtons("gTagTF", 
-                        #               label = paste0("5. Are you using a pGTag series plasmid, and do you ", 
-                        #                              "want to download a copy of the plasmid with your oligonucleotide insertions?"), 
-                        #               choices = c("Yes" = 1,
-                        #                           "No" = 0),
-                        #               selected = 1),
-                        #  conditionalPanel(
-                        #    condition = "input.gTagTF == 1",
-                        #    selectInput("plasmidName",
-                        #                label = "Plasmid: ",
-                        #                choices = c("pGTag-eGFP-B-actin" = 1,
-                        #                            "pGTag-eGFP-caax-B-actin" = 2,
-                        #                            "pGTag-eGFP-caax-SV40" = 3,
-                        #                            "pGTag-eGFP-B-actin" = 4,
-                        #                            "pGTag-Gal4-VP16-B-actin" = 5,
-                        #                            "pGTag-NLS-eGFP-B-actin" = 6,
-                        #                            "pGTag-NLS-eGFP-SV40" = 7,
-                        #                            "pGTag-NLS-TagRFP-B-actin" = 8,
-                        #                            "pGTag-NLS-TagRFP-SV40" = 9,
-                        #                            "pGTag-TagRFP-B-actin" = 10,
-                        #                            "pGTag-TagRFP-caax-B-actin" = 11,
-                        #                            "pGTag-TagRFP-caax-SV40" = 12,
-                        #                            "pGTag-TagRFP-SV40" = 13
-                        #                ),
-                        #                selected = 1)
-                        #  )),
+                        wellPanel(
+                          
+                            selectInput("plasmidName",
+                                        label = "5. If you are using a pGTag series plasmid, you can specify the plasmid below and download a copy of the finished pGTag donor vector, including homology arms.",
+                                        choices = c("pGTag-eGFP-B-actin" = 1,
+                                                    "pGTag-eGFP-caax-B-actin" = 2,
+                                                    "pGTag-eGFP-caax-SV40" = 3,
+                                                    "pGTag-eGFP-B-actin" = 4,
+                                                    "pGTag-Gal4-VP16-B-actin" = 5,
+                                                    "pGTag-NLS-eGFP-B-actin" = 6,
+                                                    "pGTag-NLS-eGFP-SV40" = 7,
+                                                    "pGTag-NLS-TagRFP-B-actin" = 8,
+                                                    "pGTag-NLS-TagRFP-SV40" = 9,
+                                                    "pGTag-TagRFP-B-actin" = 10,
+                                                    "pGTag-TagRFP-caax-B-actin" = 11,
+                                                    "pGTag-TagRFP-caax-SV40" = 12,
+                                                    "pGTag-TagRFP-SV40" = 13
+                                        ),
+                                        selected = 1)
+                          ),
                         
                         
                         ############SUBMIT####################
@@ -377,121 +340,55 @@ shinyUI(
                           
                           
                           ####Output####
-                          p(""),
-                          p(""),
+                          h3("Oligonucleotides:"),
+                          tags$br(),
                           p("5' forward oligo: "),
                           textOutput("fivePF"),
-                          p(""),
-                          p(""),
+                          tags$br(),
                           p("5' reverse oligo:"),
                           textOutput("fivePR"),
-                          p(""),
-                          p(""),
+                          tags$br(),
                           p("3' forward oligo:"),
                           textOutput("threePF"),
-                          p(""),
-                          p(""),
+                          tags$br(),
                           p("3' reverse oligo:"),
                           textOutput("threePR"),
                           
-                          p(""),
-                          p(""),
+                          tags$br(),
                           
-                          uiOutput("downOut")#,
-                          #conditionalPanel(
-                          #  condition = "input.gTagTF == 1",
-                          #  uiOutput("downPlas")
-                          #)
+                          uiOutput("downOut"),
+                          tags$br(),
+                          uiOutput("downPlasOut")
+                          
                         )
                       )
              ),
              
-             
-             
-             ##########HOW TO CITE Tab#########################################
-             tabPanel(
-               tags$div("How to Cite", style = "color:white"),
-               titlePanel(""),
-               
-               #Sidebar panel with links
-               column(2, wellPanel(
-                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                 p(""),
-                 tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                 p(""),
-                 tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                 p(""),
-                 tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
-                                      target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
-               )),
-               
-               #Text area in center of page
-               column(9, wellPanel(
-                 p("Manuscript is in prep; citation will be available shortly.")
-               ))
-               
-             ),
-             
-             ##########CONTACT US Tab##########################################
-             tabPanel(
-               tags$div("Report Bugs or Contact Us", style = "color:white"),
-               titlePanel(""),
-               #Sidebar panel with links
-               column(2, wellPanel(
-                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                 p(""),
-                 tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                 p(""),
-                 tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                 p(""),
-                 tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
-                                      target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
-               )),
-               
-               #Text area in center of page
-               column(9, 
-                      wellPanel(
-                        p("Please use the form below, or email us directly at GeneSculptSuite@gmail.com, to report issues and request support."),
-                        p("Please note that GTagHD requires the latest version of Javascript to be enabled for full functionality.")
-                      ),
-                 
-                   tags$iframe(id = "googleform", 
-                               src = "https://docs.google.com/forms/d/e/1FAIpQLSeq9aDRj6EOCskBwPsA2PFQ2LsKxT4v85-rGTlYQOk0n8X2Gw/viewform?usp=pp_url&entry.358268393&entry.1646278736=GTagHD&entry.1934309806&entry.565411344&entry.754537383&entry.826100992",
-                               width = 760,
-                               height = 2000,
-                               frameborder = 0,
-                               marginheight = 0)
-                 
-             )
-               
-             ),
              ##########TOOLS AND DOWNLOADS TAB#################################
              
              tabPanel(
-               tags$div("Tools and Downloads", style = "color:white"),
+               tags$div("Tools and Protocols", style = "color:white"),
                titlePanel(""),
                
                #Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                 p(""),
+                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
                                       target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%")))),
-                 p(""),
+                 tags$br(),
                  p(tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", "Download GTagHD at GitHub"))
                )),
-
+               
                #Text area in center of page
                column(9, wellPanel(
                  h3("Download Stand-alone GTagHD"),
-                      p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
+                 p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
                ),
                wellPanel(
                  #p("Download standalone version, or other stuff."),
@@ -666,27 +563,95 @@ shinyUI(
                #Sidebar panel with links
                column(2, wellPanel(
                  #Sidebar panel with links
-                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                 p(""),
+                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
                                       target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.nih.gov/", target = "_blank", tags$img(src = "nihlogo.png", width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://dill-picl.org", target = "_blank", tags$img(src = "lawlab_web_wiki_header.png", width = "100%"))))
                )),
                
                #Text area in center of page
                column(9, wellPanel(
-                 tags$p("This webtool was created and is maintained by funding through NIH R24 OD020166 and is a joint effort by Iowa State University and The Mayo Clinic."),
+                 tags$p("This webtool was created and is maintained by funding through ", a(href = "https://projectreporter.nih.gov/project_info_description.cfm?aid=9276155&icde=37715852", target = "_blank", 'NIH R24 OD020166: Development of Tools for Site-directed Analysis of Gene Function'), " and is a joint effort by ", a(href = "https://www.iastate.edu/", target = "_blank", 'Iowa State University'), " and ", a(href = "https://www.mayoclinic.org/", target = "_blank", " The Mayo Clinic.")),
                  tags$p("This server is generously hosted by the", a(href = "https://dill-picl.org/", target = "_blank", 'Lawrence-Dill Plant Informatics and Computation (Dill-PICL) Lab'), "at Iowa State University.")
+               ),
+               
+               wellPanel(
+                 p("NIH R24 OD020166 Project Abstract: "),
+                 p("The overarching goal of this application is to create tools and efficient methods to define genes that can promote human health. While a tremendous amount of data has been cataloged on gene mutation and changes in gene expression associated with complex human disease, our understanding of those genes that could be co-opted to restore patient health is lacking. To address this need and test for genes that when restored to wild type function promote health, we propose develop mutagenic, revertible and conditional alleles that provide spatial and temporal control of gene expression. The ability to make site-specific, untagged mutant alleles in zebrafish and other models has been greatly advanced by custom nucleases that include TALENs and CRISPR/Cas9 systems. These systems operate on the same principle: they are designed to bind to specific sequences in the genome and create a double strand break. The goals of this proposal leverage the activities of TALEN and CRISPR/Cas9 technologies to make site-specific double strand breaks. First, we propose to develop a suite of vectors to make integration alleles that are highly mutagenic and allow production of conditional and revertible alleles. Second, we propose to develop methods to generate predictable alleles in zebrafish at TALEN- and CRISPR/Cas9-induced double strand break sites by invoking the microhomology mediated end-joining pathway. Third, leveraging our preliminary data, we propose to improve methods for homology directed repair with oligonucleotides to create disease associated alleles in zebrafish and for site-specific integration using homologous recombination at TALENs and CRISPR/Cas9 cut sites. Fourth, we propose use single-strand annealing at TALENs and CRISPR/Cas9 cut sites to promote precise transgene integration to make tagged and highly mutagenic allele. These tools and techniques will have direct implications for providing precise gene editing techniques to assess the roles of genes in disease and their ability to promote health following disease progression. While we will develop these methodologies in zebrafish due to their ease of gene delivery, we anticipate these methodologies will not only enhance the efficiency of gene editing but will be readily adaptable for use in other model organisms and large animals. In our opinion, this will have important implications for modeling human disease and health in animal systems by greatly enhancing the ability to make predictible alleles, small nucleotide polymorphisms similar to those associated with human disease, and conditional alleles to test for the ability of a gene to restore health.")
                ))
              ),
+             
+             ##########HOW TO CITE Tab#########################################
+             tabPanel(
+               tags$div("How to Cite", style = "color:white"),
+               titlePanel(""),
+               
+               #Sidebar panel with links
+               column(2, wellPanel(
+                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
+                                      target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
+               )),
+               
+               #Text area in center of page
+               column(9, wellPanel(
+                 p("Manuscript is in prep; citation will be available shortly.")
+               ))
+               
+             ),
+             
+             ##########CONTACT US Tab##########################################
+             tabPanel(
+               tags$div("Report Bugs or Contact Us", style = "color:white"),
+               titlePanel(""),
+               #Sidebar panel with links
+               column(2, wellPanel(
+                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
+                                      target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
+               )),
+               
+               #Text area in center of page
+               column(9, 
+                      wellPanel(
+                        p("Please use the form below, or email us directly at GeneSculptSuite@gmail.com, to report issues and request support."),
+                        p("Please note that GTagHD requires the latest version of Javascript to be enabled for full functionality.")
+                      ),
+                 
+                   tags$iframe(id = "googleform", 
+                               src = "https://docs.google.com/forms/d/e/1FAIpQLSeq9aDRj6EOCskBwPsA2PFQ2LsKxT4v85-rGTlYQOk0n8X2Gw/viewform?usp=pp_url&entry.358268393&entry.1646278736=GTagHD&entry.1934309806&entry.565411344&entry.754537383&entry.826100992",
+                               width = 760,
+                               height = 2000,
+                               frameborder = 0,
+                               marginheight = 0)
+                 
+             )
+               
+             ),
+             
+             
+            
              
              
              ######STATUS and CHANGELOG Tab####################################
@@ -695,12 +660,12 @@ shinyUI(
                titlePanel(""),
                
                column(2, wellPanel(
-                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu:3838/gss/", target = "_blank", "Gene Sculpt Suite"))),
-                 p(""),
+                 tags$div(tags$span(a(href = "http://ll-g2f.gdcb.iastate.edu/gss/", target = "_blank", tags$img(src = "GSS logo small.png", width = "100%")))),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.iastate.edu/",   target = "_blank", tags$img(src = "isu-logo-alt.png",     width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.mayoclinic.org", target = "_blank", tags$img(src = "MC_stack_4c_DAC.png", width = "100%")))),
-                 p(""),
+                 tags$br(),
                  tags$div(tags$span(a(href = "https://www.genomewritersguild.org/", 
                                       target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png", width = "100%"))))
