@@ -21,7 +21,7 @@ shinyUI(
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("GTagHD v1.0.1", 
+             tags$div("GTagHD v1.0.6", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
@@ -76,11 +76,16 @@ shinyUI(
                         
                         p(""),
                         
-                        #ENSEMBL gene ID example; input$exampleEnsembl
-                        actionLink("exampleEnsembl", 
-                                   label = "Example For ENSEMBL Function"),
-                        
+                        #Genbank Example
+                        actionLink("exampleGenbank", 
+                                   label = "GenBank Example"),
                         p(""),
+                        
+                        #ENSEMBL gene ID example; input$exampleEnsembl
+                        #actionLink("exampleEnsembl", 
+                        #           label = "Example For ENSEMBL Function"),
+                        
+                        #p(""),
                         
                         #Reset Button; input$reset
                         actionLink("reset", 
@@ -122,14 +127,10 @@ shinyUI(
                         #),
                         ############Guide RNA selection section############################ 
                         #Guide RNA instructions
-                        p(paste0("1. Select the guide RNA type. ",
-                                 "You can use the universal guide RNA, or paste a custom ", 
-                                 "guide sequence in PLAIN TEXT format (no FASTA header).")),
-                        
                         #Buttons to select input$gRNAtype
                         radioButtons("gRNAtype", 
-                                     label = "", 
-                                     choices = list("Universal Guide RNA (for use with pGTag Series plasmids)" = 1, 
+                                     label = "1. Select the guide RNA type. You can use the universal guide RNA (for use with pGTag Series plasmids), or paste a custom guide sequence in PLAIN TEXT format (no FASTA header.)", 
+                                     choices = list("Universal Guide RNA" = 1, 
                                                     "Custom Guide RNA" = 2), 
                                      selected = 1),
                         
@@ -145,164 +146,218 @@ shinyUI(
                                         label = "", 
                                         value = "", 
                                         placeholder = "Paste custom gRNA here...")
-                        ),
-                        
-                        ############CRISPR target sequence section#########################
-                        #CRISPR target Instructions
-                        p(paste0("2. Enter the CRISPR target sequence ", 
-                                 "(23 bases total - 20 from target, 3 from PAM):")),
-                        
-                        #Space to output validation results; output$validcrisprseq
-                        textOutput("validcrisprseq"),
-                        
-                        #Box to paste crispr sequence; input$crisprSeq
-                        textAreaInput("crisprSeq", 
-                                      label = "", 
-                                      value = "", 
-                                      placeholder = "Paste CRISPR target sequence here..."),
-                        
-                        
-                        ###########cDNA/Gene ID Section####################################
-                        #Gene ID/cDNA instructions
-                        #p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
-                        #         "the box in PLAIN TEXT format (no FASTA header).")),
-                        
-                        p(paste0("3. Paste a cDNA sequence into ", 
-                                 "the box in PLAIN TEXT format (no FASTA header).")),
-                        p("ENSEMBL gene ID support coming soon."),
-                        
-                        #Buttons to choose cDNAtype; input$cDNAtype
-                        radioButtons("cDNAtype", 
-                                     label = "", 
-                                     choices = list(#"ENSEMBL gene ID" = 1, 
-                                       "Pasted cDNA" = 2), 
-                                     selected = 2),
-                        
-                        #####cDNAtype == GENE ID#####
-                        #This panel displays if the user wants to use an ENSEMBL gene ID
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 1",
+                        )),
+                        wellPanel(
                           
-                          #Space to output validated gene ID; output$validgeneid
-                          textOutput("validgeneid"),
+                          ############CRISPR target sequence section#########################
+                          #CRISPR target Instructions
+                          p(tags$div(tags$b("2. Enter the CRISPR target sequence. Please only include the 20 nt target sequence; DO NOT include the PAM sequence."))),
                           
-                          #Box to paste gene ID; input$geneId
-                          textInput("geneId", 
-                                    label = "", 
-                                    value = "", 
-                                    placeholder = "Paste ENSEMBL gene ID here...")
-                        ),
-                        
-                        #####cDNAtype == CDNA SEQUENCE#####
-                        
-                        ###This panel displays if the user is putting in their own cDNA sequence##
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 2",
+                          #conditionalPanel(
+                          #  condition = "input.sense == 0",
+                          #  p("Please include the 20 nucleotides preceding the PAM AND the PAM sequence."),
+                          #  p("For example, a target for SpCas9 should have a sequence 23 bp long - 20 nucleotides, plus the 3 bp 5'-NGG-3' PAM sequence."),
+                          #  p("GTagHD assumes that the CRISPR will cut 3bp upstream of your PAM sequence.")
+                          #),
+                          #conditionalPanel(
+                          #  condition = "input.sense == 1",
+                          #  p("Please include the PAM sequence and the 20 nucleotides succeding the PAM."),
+                          #  p("For example, a target for SaCas9 should have a sequence 26 bp long - the reverse complement of the 5'-NNNRRT-3' PAM, followed by 20 nucleotides."),
+                          #  p("GTagHD assumes that the CRISPR will cut 3bp downstream of the end of the PAM sequence.")
+                          #),
+                          p("GTagHD assumes that your CRISPR will cut between bases 17 and 18 in the case of a 5'-3' targeting sequence, and between bases 3 and 4 in the case of a 3'-5' targeting sequence, which is consistent with most Cas9 species. See 'Instructions and FAQ' tab for further clarification."),
+                          #Space to output validation results; output$validcrisprseq
+                          textOutput("validcrisprseq"),
                           
-                          #Space to output validated cDNA sequence; output$validcdna
-                          textOutput("validcdna"),
-                          
-                          #Box to paste cDNA sequence; input$cDNA
-                          textAreaInput("cDNA", 
+                          #Box to paste crispr sequence; input$crisprSeq
+                          textAreaInput("crisprSeq", 
                                         label = "", 
                                         value = "", 
-                                        placeholder = "Paste cDNA sequence here...", 
-                                        rows = 6),
+                                        placeholder = "Paste CRISPR target sequence here..."),
                           
-                          #Padding Selection ################
-                          #This panel displays if the user knows how many padding nucleotides to put in
-                          #Instructions
-                          p("Please select the number of 'padding' nucleotides to repair codon changes."),
+                          radioButtons("sense",
+                                       label = "Is your CRISPR target sequence in the sense (5'-target-PAM-3') or anti-sense (5'-PAM-target-3') orientation?",
+                                       choices = c("sense" = 0,
+                                                   "anti-sense" = 1),
+                                       selected = 0,
+                                       inline = TRUE)
                           
-                          #Selection drop-down box; input$padding
-                          selectInput("padding", 
+                          ###########cDNA/Gene ID Section####################################
+                          #Gene ID/cDNA instructions
+                          #p(paste0("3. Paste an ENSEMBL gene ID or a cDNA sequence into ", 
+                          #         "the box in PLAIN TEXT format (no FASTA header).")),
+                        ),
+                        wellPanel(
+                          #Buttons to choose cDNAtype; input$cDNAtype
+                          radioButtons("cDNAtype", 
+                                       label = "3. Specify the target gene of interest in the form of a GenBank accession number (ENSEMBL support coming soon), or copy/paste the gene sequence.", 
+                                       choices = list("GenBank Gene ID" = 1,
+                                                      #"ENSEMBL Gene ID" = 3,
+                                                      "Pasted cDNA" = 2), 
+                                       selected = 1),
+                          
+                          #####cDNAtype == GENBANK ID####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 1",
+                            
+                            p("Paste GenBank Accession here. If the entry matching your accession number does not have exon location information, automatic 'padding' nucleotide generation is not possible."),
+                            #p("This feature is still under development. Certain GenBank sequences will cause the application to crash due to a formatting conflict. A fix is in development."),
+                            #Space to output validated gene ID; output$validgeneid
+                            textOutput("validgenbankid"),
+                            
+                            textOutput("validgenbankDNA"),
+                            #Box to paste gene ID; input$geneId
+                            textInput("genbankId", 
                                       label = "", 
-                                      choices = list("0" = 0, 
-                                                     "1" = 1, 
-                                                     "2" = 2), 
-                                      selected = "", 
-                                      width = '100px')
-                        ),
-                        
-                        
-                        
-                        ############Microhomology Selection section########################
-                        #Determine the length of microhomology
-                        #Instructions
-                        p("4. Select the length of microhomology you wish to use (recommended value = 48):"),
-                        
-                        #Slider bar to select mh length; input$mh
-                        selectInput("mh", 
-                                    label = "", 
-                                    choices = c("12" = 12, 
-                                                "24" = 24, 
-                                                "48" = 48),
-                                    selected = 48,
-                                    width = '100px'),
-                        
-                        #Conditionally output microhomology validation for gene ID
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 1",
-                          #Space to output microhomology validation resutls; output$validmhgeneid
-                          textOutput("validmhgeneid")
-                        ),
-                        
-                        #Conditionally output microhomology validation for gene ID
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 2",
+                                      value = "", 
+                                      placeholder = "Paste GenBank nucleotide gene accession here..."),
+                            
+                            textOutput("exonWarning"),
+                            
+                            p("Do you want to generate 'padding' nucleotides to repair a codon break?"),
+                            radioButtons("paddingChoice",
+                                         label    = "",
+                                         choices  = list("Yes" = 1,
+                                                        "No"  = 2),
+                                         selected = 1,
+                                         inline = TRUE)
+                            
+                          ),
                           
-                          #Space to output microhomology validation resutls; output$validmhcdna
-                          textOutput("validmhcdna")
-                        ),
+                          #####cDNAtype == ENSEMBL ID#####
+                          #This panel displays if the user wants to use an ENSEMBL gene ID
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 3",
+                            
+                            
+                            #Space to output validated gene ID; output$validgeneid
+                            textOutput("validgeneid"),
+                            
+                            #Box to paste gene ID; input$geneId
+                            textInput("geneId", 
+                                      label = "", 
+                                      value = "", 
+                                      placeholder = "Paste ENSEMBL gene ID here...")
+                          ),
+                          
+                          
+                          #####cDNAtype == CDNA SEQUENCE#####
+                          
+                          ###This panel displays if the user is putting in their own cDNA sequence##
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 2",
+                            
+                            p("Please paste your sequence in PLAIN TEXT format. (No FASTA headers.)"),
+                            
+                            #Space to output validated cDNA sequence; output$validcdna
+                            textOutput("validcdna"),
+                            
+                            #Box to paste cDNA sequence; input$cDNA
+                            textAreaInput("cDNA", 
+                                          label = "", 
+                                          value = "", 
+                                          placeholder = "Paste cDNA sequence here...", 
+                                          rows = 6),
+                            
+                            #Padding Selection ################
+                            #This panel displays if the user knows how many padding nucleotides to put in
+                            #Instructions
+                            p("Please select the number of 'padding' nucleotides to repair codon changes."),
+                            
+                            #Selection drop-down box; input$padding
+                            selectInput("padding", 
+                                        label = "", 
+                                        choices = list("0" = 0, 
+                                                       "1" = 1, 
+                                                       "2" = 2), 
+                                        selected = "", 
+                                        width = '100px')
+                          )),
+                        
+                        
+                        wellPanel(
+                          ############Microhomology Selection section########################
+                          #Determine the length of microhomology
+                          #Instructions
+                          p("4. Select the length of microhomology you wish to use (recommended value = 48):"),
+                          
+                          #Slider bar to select mh length; input$mh
+                          selectInput("mh", 
+                                      label = "", 
+                                      choices = c("12" = 12,
+                                                  "24" = 24, 
+                                                  "36" = 36,
+                                                  "48" = 48),
+                                      selected = 48,
+                                      width = '100px'),
+                          
+                          #Conditionally output microhomology validation for gene ID
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 1",
+                            #Space to output microhomology validation resutls; output$validmhgeneid
+                            textOutput("validmhgeneid")
+                          ),
+                          
+                          #Conditionally output microhomology validation for gene ID
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 2",
+                            
+                            #Space to output microhomology validation resutls; output$validmhcdna
+                            textOutput("validmhcdna")
+                          )),
                         
                         
                         
                         ############SUBMIT####################
                         #Conditional display of submit buttons, depending on cDNA type
+                        wellPanel(
+                          #If pasting cDNA ####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 3",
+                            p("After pushing the Submit button, please wait a few seconds for your results to appear."),
+                            actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
+                          ),
+                          
+                          #If using GenBank ID ####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 1",
+                            p("After pushing the Submit button, please wait a few seconds for your results to appear."),
+                            actionButton("genBankSubmit", label = "Submit to GenBank")
+                          ),
+                          
+                          #If using ENSEMBL ID ####
+                          conditionalPanel(
+                            condition = "input.cDNAtype == 2",
+                            textOutput("geneProg"),
+                            actionButton("submit", label = "Submit")
+                          )),
                         
-                        #If pasting cDNA ####
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 1",
-                          p("After pushing the Submit button, please wait a few seconds for your results to appear."),
-                          actionButton("geneIdSubmit", label = "Submit to ENSEMBL")
-                        ),
-                        
-                        #If using gene ID ####
-                        conditionalPanel(
-                          condition = "input.cDNAtype == 2",
-                          textOutput("geneProg"),
-                          actionButton("submit", label = "Submit")
-                        ),
-                        
-                        
-                        p(""),
-                        p(""),
-                        p(""),
-                        
-                        
-                        ####Output####
-                        p(""),
-                        p(""),
-                        p("5' forward oligo: "),
-                        textOutput("fivePF"),
-                        p(""),
-                        p(""),
-                        p("5' reverse oligo:"),
-                        textOutput("fivePR"),
-                        p(""),
-                        p(""),
-                        p("3' forward oligo:"),
-                        textOutput("threePF"),
-                        p(""),
-                        p(""),
-                        p("3' reverse oligo:"),
-                        textOutput("threePR"),
-                        
-                        p(""),
-                        p(""),
-                        
-                        uiOutput("downOut")
-                      )
+                        wellPanel(
+                          
+                          
+                          ####Output####
+                          p(""),
+                          p(""),
+                          p("5' forward oligo: "),
+                          textOutput("fivePF"),
+                          p(""),
+                          p(""),
+                          p("5' reverse oligo:"),
+                          textOutput("fivePR"),
+                          p(""),
+                          p(""),
+                          p("3' forward oligo:"),
+                          textOutput("threePF"),
+                          p(""),
+                          p(""),
+                          p("3' reverse oligo:"),
+                          textOutput("threePR"),
+                          
+                          p(""),
+                          p(""),
+                          
+                          uiOutput("downOut")
+                        )
                       )
              ),
              
@@ -314,12 +369,12 @@ shinyUI(
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
-                 p("Paper link here?")
+                 p("Paper link will be here when it's published.")
                )),
                
                #Text area in center of page
                column(9, wellPanel(
-                 p("When the paper is published, citation goes here...")
+                 p("Manuscript is in prep; citation will be available shortly.")
                ))
                
              ),
@@ -330,14 +385,18 @@ shinyUI(
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
-                 p("Lab website links here.")
+                 #p("Lab website links here.")
                )),
                
                #Text area in center of page
-               column(9, wellPanel(
+               column(9, 
+               wellPanel(
                  p("Please contact GTagHDHelp@gmail.com to report issues and request support."),
-                 p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
-               ))
+                 p("Before submitting a bug report, please read the instructions below on how to write a helpful bug report."),
+                 p("By following these instructions, we will be able to solve your issue more quickly.")),
+               wellPanel(
+                 includeHTML("www/20170921_A_Guide_to_Writing_Helpful_Bug_Reports.html"))
+             )
                
              ),
              ##########TOOLS AND DOWNLOADS TAB#################################
@@ -352,66 +411,170 @@ shinyUI(
                
                #Text area in center of page
                column(9, wellPanel(
+                      p("A standalone version of this code may be downloaded from", tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", " GitHub."), " The R code is provided as-is, and may not be used in commercial applications. Please be aware that you modify the code at your own risk; we are unable to provide support for modified versions.")
+               ),
+               wellPanel(
                  #p("Download standalone version, or other stuff."),
                  
                  h1("Download G-Series Plasmid Sequences"),
                  
-                 p(tags$a(href     = 'plasmids/allplasmids.zip', 
-                          target   = 'blank', 
-                          'Download all plasmids', 
-                          download = '062917_gseries_plasmids.zip')),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).ape',
-                          target   = 'blank', 
-                          "pGTag-eGFP-B-actin_(062917)", 
-                          download = "pGTag-eGFP-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-eGFP-caax-B-actin_(062917)", 
-                          download = "pGTag-eGFP-caax-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-eGFP-caax-SV40_(062917)", 
-                          download = "pGTag-eGFP-caax-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-eGFP-B-actin_(062917)", 
-                          download = "pGTag-eGFP-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-Gal4-VP16-B-actin_(062917)", 
-                          download = "pGTag-Gal4-VP16-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-eGFP-B-actin_(062917)", 
-                          download = "pGTag-NLS-eGFP-B-actin_(062917)).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-eGFP-SV40_(062917)", 
-                          download = "pGTag-NLS-eGFP-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-TagRFP-B-actin_(062917)", 
-                          download = "pGTag-NLS-TagRFP-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-NLS-TagRFP-SV40_(062917)", 
-                          download = "pGTag-NLS-TagRFP-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-TagRFP-B-actin_(062917)", 
-                          download = "pGTag-TagRFP-B-actin_(062917).ape")),
-                 p(tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).ape', 
-                          target = 'blank', 
-                          "pGTag-TagRFP-caax-B-actin_(062917)", 
-                          download = "pGTag-TagRFP-caax-B-actin_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-TagRFP-caax-SV40_(062917)", 
-                          download = "pGTag-TagRFP-caax-SV40_(062917).ape")),
-                 p(tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).ape', 
-                          target   = 'blank', 
-                          "pGTag-TagRFP-SV40_(062917)", 
-                          download = "pGTag-TagRFP-SV40_(062917).ape"))
+                 tags$p("Download all plasmids in ", 
+                        tags$a(href     = 'plasmids/062917_gseries_plasmids_gb.zip', 
+                               target   = 'blank', 
+                               'GenBank', 
+                               download = '062917_gseries_plasmids_gb.zip'),
+                        " format or ",
+                        tags$a(href     = 'plasmids/062917_gseries_plasmids_ape.zip', 
+                               target   = 'blank', 
+                               'ApE', 
+                               download = '062917_gseries_plasmids_ape.zip'),
+                        " format"),
+                 tags$p("Or download individual plasmids: "),
+                 tags$p("pGTag-eGFP-B-actin_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).gb',
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-B-actin_(062917).ape',
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-B-actin_(062917).ape")
+                        
+                 ),
+                 
+                 tags$p("pGTag-eGFP-caax-B-actin_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-caax-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-caax-B-actin_(062917).ape")
+                        
+                 ),
+                 
+                 tags$p("pGTag-eGFP-caax-SV40_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-caax-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-caax-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-caax-SV40_(062917).ape")
+                        
+                 ),
+                 
+                 tags$p("pGTag-eGFP-B-actin_(062917): ",
+                        tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-eGFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-eGFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-eGFP-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-Gal4-VP16-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-Gal4-VP16-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-Gal4-VP16-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-Gal4-VP16-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-NLS-eGFP-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-eGFP-B-actin_(062917)).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-eGFP-B-actin_(062917)).ape")
+                 ),
+                 
+                 tags$p("pGTag-NLS-eGFP-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-eGFP-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-eGFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-eGFP-SV40_(062917).ape")
+                 ),
+                 tags$p("pGTag-NLS-TagRFP-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-TagRFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-TagRFP-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-NLS-TagRFP-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-NLS-TagRFP-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-NLS-TagRFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-NLS-TagRFP-SV40_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-B-actin_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-B-actin_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-B-actin_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-caax-B-actin_(062917)",
+                        tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).gb', 
+                               target = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-caax-B-actin_(062917).gb"),
+                        tags$a(href = 'plasmids/pGTag-TagRFP-caax-B-actin_(062917).ape', 
+                               target = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-caax-B-actin_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-caax-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-caax-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-caax-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-caax-SV40_(062917).ape")
+                 ),
+                 
+                 tags$p("pGTag-TagRFP-SV40_(062917)",
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).gb', 
+                               target   = 'blank', 
+                               "GenBank", 
+                               download = "pGTag-TagRFP-SV40_(062917).gb"),
+                        tags$a(href     = 'plasmids/pGTag-TagRFP-SV40_(062917).ape', 
+                               target   = 'blank', 
+                               "ApE", 
+                               download = "pGTag-TagRFP-SV40_(062917).ape")
+                 )
+                 
                ))
                
              ),

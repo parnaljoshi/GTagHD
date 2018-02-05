@@ -21,3 +21,17 @@ body,
 .shiny-output-error-validation {
   color: red;
 }
+
+.image1 {
+    display: table;
+}
+.image1 img {
+    width: 100%;
+    height: auto;
+}
+.image1 .caption {
+    display: table-caption;
+    caption-side: bottom;
+    width: 100%;
+    height: auto;
+}
