@@ -23,7 +23,7 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
   #' Determine the location of the CRISPR cut site in the cDNA sequence:
   cutSite <- getGenomicCutSite(toupper(dnaSeq), toupper(crisprSeq), orientation)
   #' Construct oligos correctly if reverse flag has been applied
-  if(!revFlag){
+  if(revFlag == FALSE){
     progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
     fiveData <- get5Prime(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding)
@@ -675,3 +675,24 @@ wonkyGenBankHandler <- function(gba){
   geneInfo <- formatApe(geneIn)
   return(geneInfo)
 }
+
+
+
+#################################For Handling Oligonucleotide insertions###################
+getBasePlasmid <- function(plasType){
+  switch(plasType,
+         "www/plasmids/pGTag-eGFP-B-actin_(062917).ape",
+         "www/plasmids/pGTag-eGFP-caax-B-actin_(062917).ape",
+         "www/plasmids/pGTag-eGFP-caax-SV40_(062917).ape",
+         "www/plasmids/pGTag-eGFP-SV40_(062917).ape",
+         "www/plasmids/pGTag-Gal4-VP16-B-actin_(062917).ape",
+         "www/plasmids/pGTag-NLS-eGFP-B-actin_(062917).ape",
+         "www/plasmids/pGTag-NLS-eGFP-SV40_(062917).ape",
+         "www/plasmids/pGTag-NLS-TagRFP-B-actin.ape",
+         "www/plasmids/pGTag-NLS-TagRFP-SV40_(062917).ape",
+         "www/plasmids/pGTag-TagRFP-B-actin_(062917).ape",
+         "www/plasmids/pGTag-TagRFP-caax-B-actin_(062917).ape",
+         "www/plasmids/pGTag-TagRFP-caax-SV40_(062917).ape",
+         "www/plasmids/pGTag-TagRFP-SV40_(062917).ape")
+}
+
