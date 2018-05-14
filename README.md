@@ -1,7 +1,7 @@
 # GTagHD
 This is a repository for the GTagHD knock-in tool.
 
-You can run GTagHD online through a web interface here: http://ll-g2f.gdcb.iastate.edu/gtaghd/
+You can run GTagHD online through a web interface here: http://genesculpt.org/gtaghd/
  
 
 ### If you already have R and/or RStudio installed, you can jump to [here](https://github.com/Dobbs-Lab/GTagHD#run-gtaghd-locally) to immmediately start running GTagHD locally.
