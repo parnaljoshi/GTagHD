@@ -143,6 +143,9 @@ formatApe <- function(apeContents){
         orientation <- "default"
         startIn <- as.numeric(strsplit(gsub("\\<", "", gsub("\\>", "", indexString, perl = TRUE)), "\\.\\.", perl = TRUE)[[1]][1])
         stopIn  <- as.numeric(strsplit(gsub("\\<", "", gsub("\\>", "", indexString, perl = TRUE)), "\\.\\.", perl = TRUE)[[1]][2])
+        #print(indexString)
+        #print(startIn)
+        #print(stopIn)
       }
       jSStart <- NA
       jSEnd   <- NA
@@ -173,7 +176,7 @@ formatApe <- function(apeContents){
     featValues[7, 1] <- "genomicContext"
     featValues$value[7] <- as.character(seqFeat)
     featValues[8, 1] <- "featureSequence"
-    featValues$value[8] <- (if(orientation == "complement"){reverseComplement(as.character(seqFeat))} else {as.character(seqFeat)})
+    featValues$value[8] <- toupper((if(orientation == "complement"){reverseComplement(as.character(seqFeat))} else {as.character(seqFeat)}))
     featList[[i]] <- featValues
   }
   
@@ -238,13 +241,22 @@ getFeatureValues <- function(featureLines){
   df$value <- NA
   
   #For each qualifier
-  for(i in valueLines){
+  for(i in 1:length(valueLines)){
     #Get the name of the qualifier
-    valName <- gsub("\\s+/", "", strsplit(featureLines[i], "=", fixed = TRUE)[[1]][1])
+    valName <- gsub("\\s+/", "", strsplit(featureLines[valueLines[i]], "=", fixed = TRUE)[[1]][1])
     
     #Determine if the qualifier spans multiple lines, and stitch the lines together if so
-    if(stringr:::str_count(featureLines[i], "\"") == 1){
-      searchLine <- paste0(featureLines[i], featureLines[i + 1])
+    if(stringr:::str_count(featureLines[valueLines[i]], "\"") >= 1){
+      if(i < length(valueLines)){
+        searchLines <- sapply(valueLines[i]:(valueLines[i + 1] - 1), function(x) featureLines[x])
+        
+      } else {
+        searchLines <- sapply(valueLines[i]:length(featureLines), function(x) featureLines[x])
+        
+      }
+
+      searchLine <- paste(searchLines, sep = "")
+      #searchLine <- paste0(featureLines[valueLines[i]], featureLines[valueLines[i] + 1])
     } else {
       searchLine <- featureLines[i]
     }
@@ -266,16 +278,29 @@ getFeatureValues <- function(featureLines){
 
 
 getExonLocus <- function(gene){
-  geneF <- getFeatures(gene)
-  cdsFlag <- FALSE
+  #Get the features from the Gene
+  geneF    <- getFeatures(gene)
+  cdsFlag  <- FALSE
+  mRNAFlag <- FALSE
+  
+  #Get all the exons
   exonList <- which(sapply(sapply(geneF, "[", 2), "[", 1) == "exon")
   
+  #If there are no exons, use CDS
   if(length(exonList) < 1){
     exonList <- which(sapply(sapply(geneF, "[", 2), "[", 1) == "CDS")
-    cdsFlag <- TRUE
+    cdsFlag  <- TRUE
   }
+  
+  #If there are no CDS, use mRNA
+  #If there are no exons, use CDS
   if(length(exonList) < 1){
-    return("Error: No exons or CDS")
+    exonList <- which(sapply(sapply(geneF, "[", 2), "[", 1) == "mRNA")
+    mRNAFlag <- FALSE
+  }
+  
+  if(length(exonList) < 1){
+    return("Error: No exons, CDS, or mRNA")
     
   } else {
     geneExons <- list()
@@ -284,41 +309,64 @@ getExonLocus <- function(gene){
      
        for(p in 1:length(exonList)){
          curBit <- geneF[exonList[p]][[1]]
-         joinS  <- curBit[5, 2]
-         joinE  <- curBit[6, 2]
-         for(q in 1:length(joinS[[1]])){
-           subGene <- curBit
-           subGene[2, 2] <- joinS[[1]][q]
-           subGene[3, 2] <- joinE[[1]][q]
-           tFrame <- data.frame(qualifier = "number", value = q)
-           subGene <- rbind(subGene, tFrame)
-           geneExons <- rlist:::list.append(geneExons, subGene)
+         if(is.na(curBit[2, 2]) && is.na(curBit[3, 2])){
+           joinS  <- curBit[5, 2]
+           joinE  <- curBit[6, 2]
+           
+           for(q in 1:length(joinS[[1]])){
+             subGene <- curBit
+             subGene[2, 2] <- joinS[[1]][q]
+             subGene[3, 2] <- joinE[[1]][q]
+             tFrame <- data.frame(qualifier = "number", value = q)
+             subGene <- rbind(subGene, tFrame)
+             geneExons <- rlist:::list.append(geneExons, subGene)
+           }
+         } else {
+           geneExons <- geneF[exonList]
          }
+         
+         
        }
+      
     } else {
       geneExons <- geneF[exonList]
     }
 
-    exonTable <- data.frame(start       = numeric(length(exonList)), 
-                            stop        = numeric(length(exonList)),
-                            type        = character(length(exonList)),
-                            orientation = character(length(exonList)),
-                            number      = character(length(exonList)),
-                            stringsAsFactors = FALSE)
+    #Determine if exons are numbered
+    numberedLength <- "number" %in% sapply(geneExons, "[[", 1)
     
-    for(i in 1:length(geneExons)){
-        exonTable[i, 1] <- geneExons[[i]][2, 2]
-        exonTable[i, 2] <- geneExons[[i]][3, 2]
-        exonTable[i, 3] <- geneExons[[i]][1, 2]
-        exonTable[i, 4] <- geneExons[[i]][4, 2]
-        exonTable[i, 5] <- geneExons[[i]][which(geneExons[[i]]$qualifier == "number"),2]
+    exonTable <- data.frame(start            = numeric(length(geneExons)), 
+                            stop             = numeric(length(geneExons)),
+                            length           = numeric(length(geneExons)),
+                            type             = character(length(geneExons)),
+                            orientation      = character(length(geneExons)),
+                            Exon_Num         = numeric(length(geneExons)),
+                            stringsAsFactors = FALSE)
+      
+    if(numberedLength){
+      for(i in 1:length(geneExons)){
+        exonTable[i, 1] <- as.numeric(geneExons[[i]][2, 2])
+        exonTable[i, 2] <- as.numeric(geneExons[[i]][3, 2])
+        exonTable[i, 3] <- as.numeric(geneExons[[i]][3, 2]) - as.numeric(geneExons[[i]][2, 2])
+        exonTable[i, 4] <- geneExons[[i]][1, 2]
+        exonTable[i, 5] <- geneExons[[i]][4, 2]
+        exonTable[i, 6] <- geneExons[[i]][which(geneExons[[i]]$qualifier == "number"),2]
+      }
+      
+    } else {
+      for(i in 1:length(geneExons)){
+        exonTable[i, 1] <- as.numeric(geneExons[[i]][2, 2])
+        exonTable[i, 2] <- as.numeric(geneExons[[i]][3, 2])
+        exonTable[i, 3] <- as.numeric(geneExons[[i]][3, 2]) - as.numeric(geneExons[[i]][2, 2])
+        exonTable[i, 4] <- geneExons[[i]][1, 2]
+        exonTable[i, 5] <- geneExons[[i]][4, 2]
+        exonTable[i, 6] <- i
+      }
     }
     
     return(exonTable)
   }
 }
-
-
 
 apeShift <- function(plasmid1, oligos){
   plasmid <- plasmid1
@@ -342,36 +390,86 @@ apeShift <- function(plasmid1, oligos){
   downstreamBoth <- which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) > threeE)
   
   #Find features that overlap with deleted sections, which will need to be removed
-  delete5 <- union(intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) >= fiveS), which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) <= fiveE)), intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) >= fiveS), which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) <= fiveE)))
-  delete3 <- union(intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) >= threeS), which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) <= threeE)), intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) >= threeS), which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) <= threeE)))
+  delete5 <- union(intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) >= fiveS), 
+                             which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) <= fiveE)), 
+                   intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) >= fiveS), 
+                             which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) <= fiveE)))
+  
+  delete3 <- union(intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) >= threeS), 
+                             which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 2)) <= threeE)), 
+                   intersect(which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) >= threeS), 
+                             which(as.numeric(sapply(sapply(plasmid$FEATURES, '[[', 2), '[[', 3)) <= threeE)))
   
   #Shift the start and stop indices for downstream features
   for(i in downstreamF){
-    
     plasmid$FEATURES[[i]][[2]][[2]] <- as.numeric(plasmid$FEATURES[[i]][[2]][[2]]) - (fiveE - fiveS + 1) + nchar(oligo5F)
     plasmid$FEATURES[[i]][[2]][[3]] <- as.numeric(plasmid$FEATURES[[i]][[2]][[3]]) - (fiveE - fiveS + 1) + nchar(oligo5F)
-    
   }
-  
   
   for(j in downstreamBoth){
     plasmid$FEATURES[[j]][[2]][[2]] <- as.numeric(plasmid$FEATURES[[j]][[2]][[2]]) - ((threeE - threeS + 1)) + nchar(oligo3F)
     plasmid$FEATURES[[j]][[2]][[3]] <- as.numeric(plasmid$FEATURES[[j]][[2]][[3]]) - ((threeE - threeS + 1)) + nchar(oligo3F)
-    
   }
   
-  
   #Remove to-be deleted sequence from origin and replace with oligos
-  stringi::stri_sub(plasmid$ORIGIN, fiveS, fiveE) <- oligo5F
+  stringi::stri_sub(plasmid$ORIGIN, fiveS, fiveE)                                                                                 <- oligo5F
   stringi::stri_sub(plasmid$ORIGIN, threeS - (fiveE - fiveS) + nchar(oligo5F) - 1, threeE - (fiveE - fiveS) + nchar(oligo5F) - 1) <- oligo3F
   
   #Remove features that need to be deleted
   plasmid$FEATURES[c(delete5, delete3)] <- NULL
   
   #Add oligo features
-  fiveFQT <- data.frame(qualifier = c("feature_type", "featStart", "featEnd", "orientation", "joinStart", "joinStop", "genomicContext", "featureSequence", "locus_tag", "ApEinfo_fwdcolor", "ApEinfo_revcolor", "ApEinfo_graphicformat"), value = c("misc_feature", fiveS, fiveS + nchar(oligo5F) - 1, "default", NA, NA, "", oligo5F, "5' forward GTagHD oligonucleotide insert", "#ff0000", "#ff0000", "arrow_data {{0 1 2 0 0 -1} {} 0} width 5 offset 0"), stringsAsFactors = FALSE)  
-  threeFQT <- data.frame(qualifier = c("feature_type", "featStart", "featEnd", "orientation", "joinStart", "joinStop", "genomicContext", "featureSequence", "locus_tag", "ApEinfo_fwdcolor", "ApEinfo_revcolor", "ApEinfo_graphicformat"), value = c("misc_feature", threeS - (fiveE - fiveS) + nchar(oligo5F) - 1, threeS - (fiveE - fiveS) + nchar(oligo5F) + nchar(oligo3F) - 2, "default", NA, NA, "", oligo3F, "3' forward GTagHD oligonucleotide insert", "#ff0000", "#ff0000", "arrow_data {{0 1 2 0 0 -1} {} 0} width 5 offset 0"), stringsAsFactors = FALSE) 
+  fiveFQT  <- data.frame(qualifier = c("feature_type", 
+                                       "featStart", 
+                                       "featEnd", 
+                                       "orientation", 
+                                       "joinStart", 
+                                       "joinStop", 
+                                       "genomicContext", 
+                                       "featureSequence", 
+                                       "locus_tag", 
+                                       "ApEinfo_fwdcolor", 
+                                       "ApEinfo_revcolor", 
+                                       "ApEinfo_graphicformat"), 
+                         value     = c("misc_feature", 
+                                       fiveS, 
+                                       fiveS + nchar(oligo5F) - 1, 
+                                       "default", 
+                                       NA, 
+                                       NA, 
+                                       "", 
+                                       oligo5F, 
+                                       "5' forward GTagHD oligonucleotide insert", 
+                                       "#ff0000", 
+                                       "#ff0000", 
+                                       "arrow_data {{0 1 2 0 0 -1} {} 0} width 5 offset 0"), 
+                         stringsAsFactors = FALSE)  
   
+  threeFQT <- data.frame(qualifier = c("feature_type", 
+                                       "featStart", 
+                                       "featEnd", 
+                                       "orientation", 
+                                       "joinStart", 
+                                       "joinStop", 
+                                       "genomicContext", 
+                                       "featureSequence", 
+                                       "locus_tag", 
+                                       "ApEinfo_fwdcolor", 
+                                       "ApEinfo_revcolor", 
+                                       "ApEinfo_graphicformat"), 
+                         value     = c("misc_feature", 
+                                       threeS - (fiveE - fiveS) + nchar(oligo5F) - 1, 
+                                       threeS - (fiveE - fiveS) + nchar(oligo5F) + nchar(oligo3F) - 2, 
+                                       "default", 
+                                       NA, 
+                                       NA, 
+                                       "", 
+                                       oligo3F, 
+                                       "3' forward GTagHD oligonucleotide insert", 
+                                       "#ff0000", 
+                                       "#ff0000", 
+                                       "arrow_data {{0 1 2 0 0 -1} {} 0} width 5 offset 0"), 
+                         stringsAsFactors = FALSE) 
   
   plasmid <- createNewFeature(plasmid, fiveFQT)
   plasmid <- createNewFeature(plasmid, threeFQT)
@@ -394,7 +492,7 @@ writeApe <- function(plasmid, fileName){
   
   #Print comments
   for(i in 1:length(plasmid$COMMENT)){
-    cat(paste0("COMMENT     ", plasmid$COMMENT[i]), sep = "\n")
+    cat(paste0("COMMENT     ",         plasmid$COMMENT[i]), sep = "\n")
   }
   
   cat(  paste0("FEATURES             Location/Qualifiers"), sep = "\n")
@@ -445,17 +543,17 @@ writeApe <- function(plasmid, fileName){
   }
   
   cat(paste0("ORIGIN"), sep = "\n")
-  seq <- plasmid$ORIGIN
+  seq       <- plasmid$ORIGIN
   seqLength <- nchar(seq)
   
   #Print/format sequence
-  for(i in 1:(ceiling(seqLength/60))){
+  for(i in 1:(ceiling(seqLength / 60))){
     v <- 1 + (60 * (i - 1))
     
     cat(paste0(paste(rep(" ", 9 - nchar(as.character(v))), collapse = ""),
                v,
                " ",
-               substr(seq, start = 1 + (60 * (i - 1)), stop = 10 + (60 * (i - 1))),
+               substr(seq, start =  1 + (60 * (i - 1)), stop = 10 + (60 * (i - 1))),
                " ",
                substr(seq, start = 11 + (60 * (i - 1)), stop = 20 + (60 * (i - 1))),
                " ",
@@ -494,13 +592,14 @@ createNewFeature <- function(plasmid, qualTable){
 readApe <- function(inFile){
   
   #If the file exists, do stuff
-  if(validateFileExists(inFile)){
+  #if(validateFileExists(inFile)){
     #Read in the ape file
     apeContents <- readLines(inFile, warn = TRUE)
-  }
+  #}
   
   return(formatApe(apeContents))
 }
+
 
 findUniGuideSites <- function(apeContents){
   UseMethod("findUniGuideSites", apeContents)
@@ -508,19 +607,19 @@ findUniGuideSites <- function(apeContents){
 
 findUniGuideSites.list <- function(apeContents){
   featList <- apeContents
-  sites <- grep("BfuAI site 1 overhang", featList)
-  sites <- append(sites, grep("BfuAI site 2 overhang", featList))
-  sites <- append(sites, grep("BspQI site 1 overhang", featList))
-  sites <- append(sites, grep("BspQI site 2 overhang", featList))
+  sites    <- grep(              "BfuAI site 1 overhang", featList)
+  sites    <- append(sites, grep("BfuAI site 2 overhang", featList))
+  sites    <- append(sites, grep("BspQI site 1 overhang", featList))
+  sites    <- append(sites, grep("BspQI site 2 overhang", featList))
   return(sites)
 }
 
 findUniGuideSites.apePlasmid <- function(apeContents){
   featList <- getFeatures(apeContents)
-  sites <- grep("BfuAI site 1 overhang", featList)
-  sites <- append(sites, grep("BfuAI site 2 overhang", featList))
-  sites <- append(sites, grep("BspQI site 1 overhang", featList))
-  sites <- append(sites, grep("BspQI site 2 overhang", featList))
+  sites    <- grep(              "BfuAI site 1 overhang", featList)
+  sites    <- append(sites, grep("BfuAI site 2 overhang", featList))
+  sites    <- append(sites, grep("BspQI site 1 overhang", featList))
+  sites    <- append(sites, grep("BspQI site 2 overhang", featList))
   return(sites)
 }
 
