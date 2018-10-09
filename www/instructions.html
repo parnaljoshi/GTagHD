@@ -63,11 +63,14 @@
   <li>Your guide RNA corresponds to an intron (and thus there is no codon break to repair</li>
   <p></p>
   <p>We will shortly have an option to manually specify the number of nucleotides to generate. You can also manually paste your sequence of interest, and manually generate codon break repair nucleotides that way.</p>
+  <p></p>
+  <p><strong>Why shouldn't I use RefSeq mRNA entries?</strong></p>
+  <p>RefSeq mRNA entries usually contain the post-spliced DNA sequence. GTagHD creates oligonucleotides based on the sequence it is given, so as far as it can tell, the post-spliced RefSeq mRNA has no introns. If your guide corresponds to a position in the exon where the homology arms would run off the end of the exon (e.g., your genomic guide RNA cuts between the 28th and 29th nucleotides in the exon, and you select 48 bp of homology), GTagHD pulls nucleotides from the adjacent exon, rather than the adjacent intron. <strong>TL;DR: if you use RefSeq mRNA accessions, this may result in the generation of oligonucleotides that are not homologous to your genome, and thus will not generate precise integrations.</strong> We are discussing ways to address this issue in future GTagHD releases.</p>
 </div>
 <br>
 <h3 style = "display:inline-block">Troubleshooting  </h3><a href="#troubleshooting" data-toggle = "collapse"> expand/collapse </a>
 <div id = "troubleshooting" class = "collapse in">
-  <p>If you experience trouble or the website crashes, please submit a bug report using the "Report Bugs or Contact Us" tab, in the upper-left portion of the navigation bar.</p>
+  <p><strong>If you experience trouble or the website crashes, please submit a bug report using the "Report Bugs or Contact Us" tab, in the upper-right portion of the navigation bar.</strong></p>
 </div>
 </body>
 </html>
