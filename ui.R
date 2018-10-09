@@ -83,21 +83,28 @@ shinyUI(
                       #Adds a sidebar for users to pre-populate fields with an example, and reset the form
                       column(2, wellPanel(
                         
+                        p(strong("Example Inputs")),
+                        p('Please click the "Example" links below to pre-populate this form with example inputs:'),
+                        
+                        tags$br(),
+                        
                         #Cut/Paste gene/exon example; input$example
                         actionLink("example", 
-                                   label = "pGTag Pasted Sequence Example"),
+                                   label = "[Example pGTag pasted sequence input]"),
                         
+                        br(),
                         tags$br(),
                         
                         #Genbank Example
                         actionLink("exampleGenbank", 
-                                   label = "pGTag GenBank Example"),
+                                   label = "[Example pGTag GenBank input for the zebrafish noto (flh) gene]"),
                         #tags$br(),
                         
                         #ENSEMBL gene ID example; input$exampleEnsembl
                         #actionLink("exampleEnsembl", 
                         #           label = "Ensembl Example"),
                         
+                        br(),
                         tags$br(),
                         
                         #Reset Button; input$reset
@@ -218,6 +225,7 @@ shinyUI(
                               textOutput("validgenbankDNA"),
                               textOutput("validrefseqgenbankid"),
                               
+                              
                               #Box to paste gene ID; input$geneId
                               textInput("genbankId", 
                                         label       = paste0("Paste GenBank Accession here. If the entry matching your accession number does not have ", 
@@ -225,8 +233,11 @@ shinyUI(
                                         value       = "", 
                                         placeholder = "Paste GenBank nucleotide gene accession here..."),
                               
-                              #Warning (not error) if target is outside of an exon
-                              textOutput("exonWarning"),
+                              # Warning (not error) if target is RefSeq mRNA
+                              #textOutput("validnotrefseqmrna"),
+                              
+                              # Warning (not error) if target is outside of an exon
+                              #textOutput("exonWarning"),
                             #),
                             
                             #For uploading GenBank/ApE format files
@@ -684,7 +695,7 @@ shinyUI(
                
                #Text area in center of page
                column(9, wellPanel(
-                 p("Manuscript is in prep; citation will be available shortly.")
+                 includeHTML("www/citation.html")
                  
                ))
              ),
