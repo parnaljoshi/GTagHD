@@ -684,7 +684,7 @@ shinyUI(
                
                #Text area in center of page
                column(9, wellPanel(
-                 p("Manuscript is in prep; citation will be available shortly.")
+                 includeHTML("www/citation.html")
                  
                ))
              ),
