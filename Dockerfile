@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 
 # install package dependencies for GTagHD
 #RUN R -e "install.packages(c('shiny', 'shinyjs', 'stringr', 'plyr', 'XML', 'rentrez', 'rlist', 'devtools', 'httpuv', 'httr'), repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages(c('shiny', 'shinyjs', 'stringr', 'plyr', 'XML', 'rentrez', 'rlist'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('shiny', 'shinyjs', 'stringr', 'plyr', 'XML', 'rentrez', 'rlist', 'curl'), repos='https://cloud.r-project.org/')"
 
 # Copy GTagHD to image
 RUN mkdir /root/gtaghd/
