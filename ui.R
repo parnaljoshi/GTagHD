@@ -19,26 +19,32 @@ shinyUI(
              theme = "ogtheme.css", 
              
              #Page title box
-             tags$div("GTagHD v1.2.1", 
+             tags$div("GTagHD v1.2.2", 
                       style = "color:white"),
              
              ########ABOUT TAB#################################################
-             tabPanel(tags$div("About", style = "color:white"),
+             tabPanel(tags$div("About"),
                       titlePanel(""),
                       
                       #Sidebar panel with links
                       column(2, wellPanel(
-                        tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                             tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                        tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                             tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                             tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                        tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                             tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                             tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                        tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                             tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                             tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%"))))
+                        tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                             tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
+                        tags$br(),
+                        tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                             tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
+                        tags$br(),
+                        tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                             tags$img(src = "Docker_Logo.png",                        width  = "100%"))))
                       )),
                       
                       #Text area in center of page
@@ -48,22 +54,28 @@ shinyUI(
              ),
              
              ##########INSTRUCTIONS############################################
-             tabPanel(tags$div("Instructions and FAQs", style = "color:white"),
+             tabPanel(tags$div("Instructions and FAQs"),
                       titlePanel(""),
                       
                       #Sidebar panel with links
                       column(2, wellPanel(
-                        tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                             tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                        tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                             tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                             tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                        tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                             tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                             tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                        tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                             tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                             tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%"))))
+                        tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                             tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
+                        tags$br(),
+                        tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                             tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
+                        tags$br(),
+                        tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                             tags$img(src = "Docker_Logo.png",                        width  = "100%"))))
                       )),
                       
                       #Text area in center of page
@@ -76,36 +88,33 @@ shinyUI(
              
              ##########SUBMIT SINGLE JOB TAB###################################
              tabPanel(id = "single",
-                      tags$div("Submit Single Job", style = "color:white"),
+                      tags$div("Submit Job"),
                       titlePanel(""),
                       
                       ##Sidebar############################################################
                       #Adds a sidebar for users to pre-populate fields with an example, and reset the form
                       column(2, wellPanel(
-                        
-                        p(strong("Example Inputs")),
-                        p('Please click the "Example" links below to pre-populate this form with example inputs:'),
-                        
-                        tags$br(),
+                        class = "examplePanel",
+                        p(tags$b(tags$u("Example Inputs"))),
                         
                         #Cut/Paste gene/exon example; input$example
                         actionLink("example", 
-                                   label = "[Example pGTag pasted sequence input]"),
-                        
-                        br(),
+                                   label = "[Pasted Sequence Example]"),
+                        tags$br(),
                         tags$br(),
                         
                         #Genbank Example
                         actionLink("exampleGenbank", 
-                                   label = "[Example pGTag GenBank input for the zebrafish noto (flh) gene]"),
-                        #tags$br(),
+                                   label = "[GenBank Example (zebrafish noto gene)]"),
+                        tags$br(),
+                        tags$br(),
                         
                         #ENSEMBL gene ID example; input$exampleEnsembl
                         #actionLink("exampleEnsembl", 
-                        #           label = "Ensembl Example"),
+                        #           label = "[Ensembl Example (zebrafish noto gene)]"),
                         
-                        br(),
-                        tags$br(),
+                        #tags$br(),
+                        #tags$br(),
                         
                         #Reset Button; input$reset
                         actionLink("reset", 
@@ -134,9 +143,9 @@ shinyUI(
                         #Buttons to select input$gRNAtype
                         wellPanel(
                         radioButtons("gRNAtype", 
-                                     label    = paste0("1. Select the guide RNA type. You can use the universal guide RNA", 
-                                                    "(for use with pGTag Series plasmids), or paste a custom guide sequence",
-                                                    " in PLAIN TEXT format (no FASTA header.)"), 
+                                     label    = paste0("1. Select the guide RNA type. You can use the universal guide RNA ", 
+                                                       "(for use with pGTag Series plasmids), or paste a custom guide sequence ",
+                                                       "in PLAIN TEXT format (no FASTA header.)"), 
                                      choices  = list("Universal Guide RNA" = 1, 
                                                      "Custom Guide RNA"    = 2), 
                                      selected = 1),
@@ -178,16 +187,10 @@ shinyUI(
                           
                           radioButtons("sense",
                                        label = paste0("Does your CRISPR guide target the sense or anti-sense strand?"),
-                                       choices = c("sense (5'-3')"= 0,
+                                       choices = c("sense (5'-3')"      = 0,
                                                    "anti-sense (3'-5')" = 1),
                                        selected = 0,
                                        inline = TRUE)
-                          #radioButtons("sense",
-                           #            label    = paste0("Is your CRISPR target on the sense or anti-sense strand?"),
-                            #           choices  = c("sense"      = 0,
-                             #                       "anti-sense" = 1),
-                              #         selected = 0,
-                               #        inline   = TRUE)
                         ),
                         
                         ###########gene/Gene ID Section####################################
@@ -197,14 +200,14 @@ shinyUI(
                           radioButtons("cDNAtype", 
                                        #label    = paste0("3. Specify the target gene of interest in the form of a GenBank ", 
                                         #                 "accession number (ENSEMBL support coming soon), copy/paste the gene sequence, ", 
-                                        #                 "or upload a GenBank or FASTA file with your gene of interest. ",
-                                        #                 "(We DO NOT store any uploaded files for longer than the duration of your session."), 
-                                       label    = paste0("3. Specify the target gene of interest in the form of a GenBank ",
-                                                         "accession number (Ensembl support coming soon), or copy/paste the ",
-                                                         "gene sequence in plain text."),
-                                       choices  = list("GenBank Gene ID"                        = 1,
-                                                       #"ENSEMBL Gene ID"                        = 3,
-                                                       "Pasted gene/exon sequence"              = 2),
+                                         #                "or upload a GenBank or FASTA file with your gene of interest."), 
+                                       #label    = paste0("3. Specify the target gene of interest in the form of a GenBank/RefSeq accession, ",
+                                        #                 "Ensembl accession, or copy and paste the gene sequence in plain text."),
+                                       label    = paste0("3. Specify the target gene of interest in the form of a GenBank accession number ",
+                                                         "(Ensembl support coming soon), or as a copy/pasted sequence."),
+                                       choices  = list("GenBank or RefSeq Gene ID"               = 1,
+                                                       #"ENSEMBL transcript, exon, or protein ID" = 3,
+                                                       "Copy/paste gene/exon sequence"           = 2),
                                                        #"Upload a GenBank (or APE) format file"  = 4,
                                                        #"Upload a FASTA or plain text file"      = 5), 
                                        selected = 1),
@@ -224,7 +227,6 @@ shinyUI(
                               #Space to output if the genbank file is valid
                               textOutput("validgenbankDNA"),
                               textOutput("validrefseqgenbankid"),
-                              
                               
                               #Box to paste gene ID; input$geneId
                               textInput("genbankId", 
@@ -262,7 +264,7 @@ shinyUI(
                             radioButtons("paddingChoice",
                                          label    = "",
                                          choices  = list("Yes" = 1,
-                                                         "No"  = 2),
+                                                         "No"  = 0),
                                          selected = 1,
                                          inline   = TRUE)
                             
@@ -270,39 +272,51 @@ shinyUI(
                           
                           #####cDNAtype == ENSEMBL ID#####
                           #This panel displays if the user wants to use an ENSEMBL gene ID
-                          #conditionalPanel(
-                            #condition = "input.cDNAtype == 3",
-                            
-                            
-                            #Space to output validated gene ID; output$validgeneid
-                            #textOutput("validensemblid"),
-                            
-                            #Box to paste gene ID; input$geneId
-                            #textInput("geneId", 
-                            #         label = "", 
-                            #          value = "", 
-                            #          placeholder = "Paste ENSEMBL gene ID here...")
-                          #),
-                          
+                          # conditionalPanel(
+                          #   condition = "input.cDNAtype == 3",
+                          # 
+                          #   #Space to output validated gene ID; output$validgeneid
+                          #   textOutput("validensemblid"),
+                          #   tags$br(),
+                          #   
+                          #   #Box to paste gene ID; input$geneId
+                          #   textInput("ensemblId", 
+                          #             label = paste0("Paste Ensembl transcript, protein, or exon ID here. ", 
+                          #                            "Since Ensembl genes may have multiple associated transcripts, ", 
+                          #                            "we currently do not support Ensembl gene inputs. "), 
+                          #             value = "", 
+                          #             placeholder = "Paste Ensembl transcript, protein, or exon ID here..."),
+                          #   
+                          #   #Warn users about automatic codon repair requirements
+                          #   p("Do you want to generate nucleotides to repair a codon break? "),
+                          #   
+                          #   radioButtons("paddingChoice",
+                          #                label    = "",
+                          #                choices  = list("Yes" = 1,
+                          #                                "No"  = 0),
+                          #                selected = 1,
+                          #                inline   = TRUE)
+                          # ),
+                          # 
                           #####cDNAtype == CDNA SEQUENCE#####
                           ###This panel displays if the user is putting in their own cDNA sequence##
                           conditionalPanel(
                             #If they are uploading or pasting a plain-text or FASTA file
                             condition = "input.cDNAtype == 2 | input.cDNAtype == 5",
-                            
+
                             conditionalPanel(condition = "input.cDNAtype == 2",
-                                             
+
                                              #Space to output validated cDNA sequence; output$validcdna
                                              textOutput("validcdna"),
-                                             
+
                                              #Box to paste cDNA sequence; input$cDNA
-                                             textAreaInput("cDNA", 
-                                                           label       = "Please paste your sequence in plain text or FASTA format. ", 
-                                                           value       = "", 
-                                                           placeholder = "Paste gene/exon sequence here...", 
+                                             textAreaInput("cDNA",
+                                                           label       = "Please paste your sequence in plain text or FASTA format. ",
+                                                           value       = "",
+                                                           placeholder = "Paste gene/exon sequence here...",
                                                            rows        = 6)
                             ),
-                            
+
                             #conditionalPanel(condition = "input.cDNAtype == 5",
                             #                 fileInput("fptFileUpload",
                             #                           label = "Please upload your gene sequence in FASTA or plain text format (there is a 5MB max file size limit): ",
@@ -312,19 +326,19 @@ shinyUI(
                             #                           accept = "application/fasta,chemical/seq-na-fasta,text/plain",
                             #                           width = "70%")
                             #),
-                            
+
                             #Padding Selection ################
                             #This panel displays if the user knows how many padding nucleotides to put in
                             #Instructions
                             p("Please select the number of additional nucleotides required to maintain the reading frame."),
-                            
+
                             #Selection drop-down box; input$padding
-                            selectInput("padding", 
-                                        label    = "", 
-                                        choices  = list("0" = 0, 
-                                                        "1" = 1, 
-                                                        "2" = 2), 
-                                        selected = "", 
+                            selectInput("padding",
+                                        label    = "",
+                                        choices  = list("0" = 0,
+                                                        "1" = 1,
+                                                        "2" = 2),
+                                        selected = "",
                                         width    = '100px')
                           )),
                         
@@ -396,14 +410,16 @@ shinyUI(
                             condition = "input.cDNAtype == 2 || input.cDNAtype == 5",
                             textOutput("geneProg"),
                             actionButton("submit",               label = "Submit")
-                          ),
+                          )#,
                           
-                          #If using ENSEMBL gene ID ####
-                          conditionalPanel(
-                            condition = "input.cDNAtype == 3",
-                            p("After pushing the Submit button, please wait a few seconds for your results to appear."),
-                            actionButton("geneIdSubmit",         label = "Submit")
-                          )#,  
+                          # #If using ENSEMBL gene ID ####
+                          # conditionalPanel(
+                          #   condition = "input.cDNAtype == 3",
+                          #   p("After pushing the Submit button, please wait a few seconds for your results to appear."),
+                          #   actionButton("ensemblSubmit",         label = "Submit"),
+                          #   
+                          #   textOutput("validensemblDNA")
+                          # )#,  
                           
                           #If using GenBank/ApE file upload####
                          #conditionalPanel(
@@ -453,24 +469,28 @@ shinyUI(
              ##########TOOLS AND DOWNLOADS TAB#################################
              
              tabPanel(
-               tags$div("Tools and Protocols", style = "color:white"),
+               tags$div("Protocols and Downloads"),
                titlePanel(""),
                
                #Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                      tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                      tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                      tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                      tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                      tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                      tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
                  tags$br(),
-                 p(tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", "Download GTagHD at GitHub"))
+                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                      tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                      tags$img(src = "Docker_Logo.png",                        width  = "100%"))))
                )),
                
                #Text area in center of page
@@ -644,28 +664,34 @@ shinyUI(
              
              ##########FUNDING Tab#############################################
              tabPanel(
-               tags$div("Funding", style = "color:white"),
+               tags$div("Funding"),
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
                  #Sidebar panel with links
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                      tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                      tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                      tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                      tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                      tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                      tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.nih.gov/",                target = "_blank", 
-                                      tags$img(src = "nihlogo.png",                         width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                      tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://dill-picl.org",               target = "_blank", 
-                                      tags$img(src = "lawlab_web_wiki_header.png",          width  = "100%"))))
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                      tags$img(src = "Docker_Logo.png",                        width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://www.nih.gov/",                   target = "_blank", 
+                                      tags$img(src = "nihlogo.png",                            width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://dill-picl.org",                  target = "_blank", 
+                                      tags$img(src = "lawlab_web_wiki_header.png",             width  = "100%"))))
                )),
                
                #Text area in center of page
@@ -675,22 +701,28 @@ shinyUI(
              
              ##########HOW TO CITE Tab#########################################
              tabPanel(
-               tags$div("How to Cite", style = "color:white"),
+               tags$div("How to Cite"),
                titlePanel(""),
                
                #Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                      tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                      tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                      tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                      tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                      tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                      tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%"))))
+                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                      tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                      tags$img(src = "Docker_Logo.png",                        width  = "100%"))))
                )),
                
                #Text area in center of page
@@ -702,21 +734,27 @@ shinyUI(
              
              ##########CONTACT US Tab##########################################
              tabPanel(
-               tags$div("Report Bugs or Contact Us", style = "color:white"),
+               tags$div("Report Bugs or Contact Us"),
                titlePanel(""),
                #Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                      tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                      tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                      tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                      tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                      tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                      tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%"))))
+                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                      tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                      tags$img(src = "Docker_Logo.png",                        width  = "100%"))))
                )),
                
                #Text area in center of page
@@ -739,21 +777,27 @@ shinyUI(
              
              ######STATUS and CHANGELOG Tab####################################
              tabPanel(
-               tags$div("Change Log", style = "color:white"),
+               tags$div("Change Log"),
                titlePanel(""),
                
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",           target = "_blank", 
-                                      tags$img(src = "GSS logo small.png",                  width  = "100%")))),
+                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",              target = "_blank", 
+                                      tags$img(src = "GSS logo small.png",                     width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",            target = "_blank", 
-                                      tags$img(src = "isu-logo-alt.png",                    width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.iastate.edu/",               target = "_blank", 
+                                      tags$img(src = "isu-logo-alt.png",                       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",          target = "_blank", 
-                                      tags$img(src = "MC_stack_4c_DAC.png",                 width  = "100%")))),
+                 tags$div(tags$span(a(href         = "https://www.mayoclinic.org",             target = "_blank", 
+                                      tags$img(src = "MC_stack_4c_DAC.png",                    width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/", target = "_blank", 
-                                      tags$img(src = "genome-writers-guild-logo_DAC.png",   width  = "100%"))))
+                 tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",    target = "_blank", 
+                                      tags$img(src = "genome-writers-guild-logo_DAC.png",      width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",    target = "_blank", 
+                                      tags$img(src = "GitHub_Logo.png",                        width  = "100%")))),
+                 tags$br(),
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd", target = "_blank", 
+                                      tags$img(src = "Docker_Logo.png",                        width  = "100%"))))
                )),
                
                #Text area in center of page
