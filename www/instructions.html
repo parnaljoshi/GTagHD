@@ -3,11 +3,16 @@
 <body>
   <h3 style = "display:inline-block">Instructions  </h3><a href="#instructions" data-toggle = "collapse"> expand/collapse </a>
 <div id = "instructions" class = "collapse in">
-<p>The <b>GTagHD</b> web tool can automatically generate short homology arms for high efficiency, CRISPR-mediated, precise integration of pGTag vectors and pPRISM vectors <i>(coming soon)</i> to your loci of interest. </p>
+<p>The <b>GTagHD</b> web tool can automatically generate short homology arms for high-efficiency, CRISPR-mediated, precise integration of pGTag vectors and pPRISM vectors to your loci of interest. <b>GTagHD</b> should be used in conjunction with the <b>GeneWeld</b> protocols outlined by <a href="https://doi.org/10.1101/431627">Wierson and Welker et al.</a></p>
 <br>
-<p>To use the tool, choose the "Submit Single Job" tab.</p>
+<p>The <b>About</b> tab gives a brief overview of how the <b>GeneWeld</b> technology works.</p>
+<p>The <b>Instructions and FAQs</b> tab contains detailed instructions and additional information for each step of running GTagHD, </p>
+<p>To use the tool, choose the <b>Submit Job</b> tab.</p>
 <br>
-<p>Step 0) Choose which tool/plasmid series you are interested in using. The Iowa State/Mayo Clinic Alliance for Genome Engineering is actively developing several plasmid series for precision genome editing. We currently support two plasmid series, pGTag and pPRISM. More plasmid series will be added in the future.</p>
+<p>Step 0) Choose which tool/plasmid series you are interested in using. The Iowa State/Mayo Clinic Alliance for Genome Engineering is actively developing several plasmid series for precision genome editing. </p>
+<!--
+<p>We currently support two plasmid series, pGTag and pPRISM. More plasmid series will be added in the future.</p>
+<p>The primary difference between the pGTag and pPRISM plasmid series is the restriction enzyme overhangs </p> -->
 <br>
 <p>Step 1) Choose to use either our universal guide RNA for liberation of the integration cassette (recommended), or submit a custom guide RNA for cassette liberation (this can be the same as the guide for your loci.)</p>
 <br>
@@ -42,7 +47,7 @@
 <br>
 <p>Step 4) Select the length of homology to be used. We recommend using the default value of 48 nucleotides for best results. Please keep in mind the sequence length requirements mentioned in Step 3.</p>
 <br>
-<p>Step 5) In this box, you can specify the pGTag plasmid you are utilizing and generate a GenBank format file containing the plasmid sequence with your incorporated oligonucleotides. We will shortly be adding pPRISM plasmid here, as well. To use this feature, hit the "Download Plasmid File" button which will appear below your oligonucleotides after you have hit the "Submit" button for the first time. You can download a different plasmid <b>WITHOUT</b> hitting the "Submit" button again by choosing a different plasmid from the drop-down menu, and then hitting "Download Plasmid File" again.</p>
+<p>Step 5) In this box, you can specify the pGTag plasmid you are utilizing and generate a GenBank format file containing the plasmid sequence with your incorporated oligonucleotides. <!--We will shortly be adding pPRISM plasmid here, as well.--> To use this feature, hit the "Download Plasmid File" button which will appear below your oligonucleotides after you have hit the "Submit" button for the first time. You can download a different plasmid <b>WITHOUT</b> hitting the "Submit" button again by choosing a different plasmid from the drop-down menu, and then hitting "Download Plasmid File" again.</p>
 <br>
 <p>If there are any problems with the sequences and values you have entered, the web page will inform you of the errors and give you advice on how to fix them.</p>
 <br>
@@ -54,6 +59,12 @@
 <br>
 <h3 style = "display:inline-block">Frequently Asked Questions (FAQs)  </h3><a href="#FAQs" data-toggle = "collapse"> expand/collapse </a>
 <div id = "FAQs" class = "collapse in">
+  <!--
+  <p><b>The site isn't quite working properly; how can I fix this?</b></p>
+  <p>GTagHD has been tested on the following browsers: </p>
+  
+  
+  <p>If you are not using one of these browsers, we highly recommend you do so and see if that resolves the problem.</p>-->
   <p><b>Does GTagHD store data inputs?</b></p>
   <p>We do not store any data inputs. Your data inputs are only available to GTagHD for as long as your GTagHD session is active, and are only used to generate your results during that time. The file containing your oligonucleotides is only generated when you click the "Download Oligos" button. The file containing the oligos incorporated into a plasmid is also dynamically generated when you click "Download Plasmid File." These files are not stored on our server. Once you exit the GTagHD browser window, your session is deleted and everything you did during the session is gone. Therefeore, if you do not download or otherwise save your results, you will have to perform your analysis again.</p>
   <p><b>I chose the option to automatically generate nucleotides to repair a codon break, but no additional nucleotides were generated. Why did this happen?</b></p>
@@ -62,7 +73,7 @@
   <li>Your GenBank/RefSeq accession has improperly annotated exon information</li>
   <li>Your guide RNA corresponds to an intron (and thus there is no codon break to repair)</li>
   <p></p>
-  <p>We will shortly have an option to manually specify the number of nucleotides to generate. You can also manually paste your sequence of interest, and manually generate codon break repair nucleotides that way.</p>
+  <p>We will shortly have an option to manually specify the number of nucleotides to generate on GenBank sequences when this occurs. You can also manually paste your sequence of interest, and manually generate codon break repair nucleotides that way.</p>
   <p></p>
   <p><strong>Why shouldn't I use RefSeq mRNA entries?</strong></p>
   <p>RefSeq mRNA entries usually contain the post-spliced DNA sequence. GTagHD creates oligonucleotides based on the sequence it is given, so as far as it can tell, the post-spliced RefSeq mRNA has no introns. If your guide corresponds to a position in the exon where the homology arms would run off the end of the exon (e.g., your genomic guide RNA cuts between the 28th and 29th nucleotides in the exon, and you select 48 bp of homology), GTagHD pulls nucleotides from the adjacent exon, rather than the adjacent intron. <strong>TL;DR: if you use RefSeq mRNA accessions, this may result in the generation of oligonucleotides that are not homologous to your genome, and thus will not generate precise integrations.</strong> We are discussing ways to address this issue in future GTagHD releases.</p>
