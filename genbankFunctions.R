@@ -1,3 +1,44 @@
+#' getGenbankFile
+#'
+#' @param accession 
+#' @param file 
+#' @param deleteTempFile 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+# getGenbankFile <- function(accession, file = 'temp.gb', deleteTempFile = TRUE){
+#   require(curl)
+#   # Get database from accession format
+#   #db <- .getDatabaseFromAccession(accession)
+#   db <- 'nuccore'
+#   
+#   # Construct the URL
+#   baseURL <- 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+#   rettype <- 'gbwithparts'
+#   retmode <- 'text'
+#   tURL    <- paste0(baseURL, "?db=", db, "&id=", accession, "&retmode=", retmode, "&rettype=", rettype)
+#   
+#   # Get file from URL using curl
+#   curl::curl_download(url = tURL, file)
+#   
+#   # Read in file contents
+#   gbContents <- readLines(file)
+#   
+#   # Delete temporary file
+#   if(deleteTempFile){
+#     file.remove(file)
+#   }
+#   
+#   # Format the file contents
+#   gbContents <- formatApe(gbContents)
+#   
+#   return(gbContents)
+# }
+
+
 #For handling GenBank files that throw errors
 #' Title
 #'
