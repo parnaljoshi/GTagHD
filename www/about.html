@@ -3,15 +3,37 @@
   <head></head>
   <body>
     <h2>GTagHD</h2>
-    <h3>Iowa State/Mayo Clinic Alliance for Genome Engineering</h3>
-    <p>Homology directed gene targeting allows for the integration of exogenous DNA into the genome with base pair and reading frame specificity. However, design and assembly of homologous targeting vectors for a gene of interest can be time consuming.</p>
-    <p>Our modular plasmid series, pGTag, and homology design web tool, GTagHD, enable researchers to quickly design, build, and integrate a variety of cargos into a gene of interest. Golden Gate cloning of annealed oligonucleotide homology arms allows efficient, inexpensive vector assembly.</p>
-    <p>Follow the prompts under the “Submit Single Job” tab to have GTagHD design and output ready-to-order ssDNA oligonucleotides to be used in our GTag series gene targeting protocol.</p>
+    <p>GTagHD (p<b>GTag</b> <b>H</b>omology <b>D</b>esigner) is a tool for designing olionucleotides for use with the <i>GeneWeld</i> protocol. GeneWeld is a methodology for generating highly precise and efficent targeted integration. GeneWeld has been validated in zebrafish, pig fibroblast, and human cells.</p>
+    
+    <p>Please see our bioRxiv pre-print, <a href="https://doi.org/10.1101/431627" target="_blank">"GeneWeld: a method for efficient targeted integration directed by short homology"</a>, for more information.</p>
+    <p>To generate oligonucleotides for targeted integration, select "<b>Submit Job</b>."</p>
+    <p>For detailed instructions on how to use GTagHD, select "<b>Instructions and FAQs</b>."</p>
+    <p>If you would like to download the GTagHD code or GeneWeld plasmid maps, select "<b>Downloads</b>."</p>
+    <p>For information on the NIH R24 grant which supported the development of this tool, see "<b>Funding</b>."</p>
+    <p>For information on citing GeneWeld and GTagHD in your research, see "<b>How to Cite</b>."</p>
+    <p>If you experience bugs, wish to request features, or need other help, please fill out the form at "<b>Report Bugs or Contact Us</b>."</p>
+    
+    <!-- About GeneWeld -->
+    <h3>GeneWeld</h3>
+        <div>
+      <div style="width:280px;border:thin solid black;margin-left:auto;margin-right:auto;background-color:white;text-align:center;float:right;">
+        <a href="https://www.addgene.org/Jeffrey_Essner/" style="text-decoration:none;color:#1f7bae;font-size:14px;font-family:verdana,arial" target="_blank" rel="noopener noreferrer"><img src="https://www.addgene.org/headers/images/plasmid_request_button_no_pi.png" style="height:140px;margin-bottom:-23px;" alt="Link to GeneWeld Plasmids"/> Order GeneWeld Plasmids</a></div>
+      <p><a href="2019_Wierson_et_al_GeneWeld_Protocol.pdf" target="_blank">Download GeneWeld Protocol</a></p>
+      <p>GeneWeld is a technology for easily and efficiently integrating plasmid cargos into a genomic target. We have developed two plasmid series for use with GeneWeld (pGTag and pPRISM), which have a variety of features and reporters. We also have several new plasmid series under active development.</p>
+      
+      
+      </div>
+    <p>GeneWeld plasmids are available at <a href="https://www.addgene.org/Jeffrey_Essner/" target="_blank">AddGene</a> as they are developed.</p>
+
+    <h3>GeneWeld Integration Strategy</h3>
     <figure>
       <img src = "integration.png" alt = "integration scheme">
-      <figcaption>Upon CRISPR/Cas9 targeting of both the genome and plasmid donors, we hypothesize that DNA end resection mediated by the MRN complex and ExoI results in annealing of complementary homology arms. Homology dependent repair pathways drive seamless, homology directed integration of cargo DNA into the CRISPR/Cas9 DNA Double-Strand Break site.</figcaption>
+      <figcaption>GeneWeld Integration Strategy</figcaption>
     </figure>
+    
+    <p>GTagHD pulls surrounding sequence context from the targeted genomic integration site (green and blue sequence), and processes this information to generate ready-to-order oligonucleotides which can be cloned into a plasmid vector to flank the plasmid cargo of interest. When the plasmid and genomic locus are cleaved by nucleases, the homology between the cargo and the genomic locus allows a DNA repair mechanism to precisely and efficiently knock-in the cargo. While the exact mechanism of GeneWeld integration is currently unknown, we refer to the repair as "homology-mediated end joining" (HMEJ), as it is believed to be microhomology-mediated end joining (MMEJ), single-strand annealing (SSA), or an MMEJ/SSA-like pathway.</p>
       
+      <p>GTagHD, GeneWeld, and the pGTag and pPRISM plasmid series were created by the Iowa State/Mayo Clinic Alliance for Genome Engineering.</p>
   </body>
 </html>
 
