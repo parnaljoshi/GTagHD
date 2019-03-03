@@ -142,7 +142,12 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
       fivePrimeF <- paste0("gaag",  reverseComplement(fivePrimeFBase))
       fivePrimeR <- paste0("gcgg",  fivePrimeFBase)
   
-  # Everybody else's overhangs  
+   # Custom - no overhangs
+    } else if(toolSeries == 5){
+      fivePrimeF <- fivePrimeFBase
+      fivePrimeR <- reverseComplement(fivePrimeFBase)
+      
+    # Everybody else's overhangs 
     } else {
       fivePrimeF <- paste0("gcgg",  fivePrimeFBase)
       fivePrimeR <- paste0("gaag",  reverseComplement(fivePrimeFBase))
@@ -227,14 +232,20 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   
   #} else {
   # For UFlip ON, use flip overhangs
-  if(toolSeries != 4){
+  if(toolSeries == 4){
     threePrimeF <- paste0("aag", threePrimeFBase)
     threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
     
-  # For everyone else, use normal overhangs
+    # For custom series with no overhangs
+  } else if(toolSeries == 5){
+    threePrimeF <- reverseComplement(threePrimeFBase)
+    threePrimeR <- threePrimeFBase 
+    
+    # For everyone else, use normal overhangs
   } else {
     threePrimeF <- paste0("cgg", reverseComplement(threePrimeFBase))
     threePrimeR <- paste0("aag", threePrimeFBase) 
+    
   }
     
 
