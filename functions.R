@@ -26,12 +26,23 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
   #' Construct oligos correctly if reverse flag has been applied
   #if(revFlag == FALSE){
     progress$set(detail = "generating 5' oligos", value = 0.6)
-    #' Calculate the 5' oligo targeting domains
-    fiveData  <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
-    
-    progress$set(detail = "generating 3' oligos", value = 0.8)
-    #' Calculate the 3' oligo targeting domains
-    threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite)
+
+    # For UFlip ON
+    if(toolSeries == 4){
+      fiveData  <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
+      threeData <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+      
+    } else {
+      # For everybody else:
+      
+      #' Calculate the 5' oligo targeting domains
+      fiveData  <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+      
+      progress$set(detail = "generating 3' oligos", value = 0.8)
+      #' Calculate the 3' oligo targeting domains
+      threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
+      
+    }
   #} else {
   #  progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
@@ -75,7 +86,6 @@ getGenomicCutSite <- function(dnaSeq, crisprSeq, orientation){
     cutIndex <- crisprLoc[1] + 2
   }
   
-  #print(paste0("Cut Index: ", cutIndex))
   return(cutIndex)
 }
 
@@ -104,10 +114,15 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
   #Generate a three nucleotide-long spacer that is not homologous to spacer
   nhSpacer <- addNonHBP(spacer)
   
-  #print(padding)
-  #print(getPadding(dnaSeq, cutSite, padding, orientation))
-  #Create the base five prime oligo
-  fivePrimeFBase <- paste0(gRNA, nhSpacer, homology, getPadding(dnaSeq, cutSite, padding, orientation))
+  if(toolSeries == 4){
+    #Create the base five prime oligo
+    fivePrimeFBase <- paste0(nhSpacer, homology, reverseComplement(gRNA))
+    
+  } else {
+    #Create the base five prime oligo
+    fivePrimeFBase <- paste0(gRNA, nhSpacer, homology, getPadding(dnaSeq, cutSite, padding, orientation))
+    
+  }
   
   #If a custom guide RNA is used, add restriction enzyme sites
   #if(nchar(gRNA) > 0 &&  toolSeries == 0){
@@ -115,14 +130,24 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
     #fivePrimeR <- paste0("ggatc", reverseComplement(fivePrimeFBase), "g")
     
   #} else {
-    fivePrimeF <- paste0("gcgg",  fivePrimeFBase)
-    if(toolSeries == 1){
-      fivePrimeR <- paste0("gaag",  reverseComplement(fivePrimeFBase))
-    } else {
-      fivePrimeR <- paste0("atcc",  reverseComplement(fivePrimeFBase))
-    }
+    #fivePrimeF <- paste0("gcgg",  fivePrimeFBase)
     
-  #}
+  # pGTag overhangs
+    if(toolSeries == 0){
+      fivePrimeF <- paste0("gcgg",  fivePrimeFBase)
+      fivePrimeR <- paste0("atcc",  reverseComplement(fivePrimeFBase))
+      
+  # UFlip ON overhangs
+    } else if(toolSeries == 4){
+      fivePrimeF <- paste0("gaag",  reverseComplement(fivePrimeFBase))
+      fivePrimeR <- paste0("gcgg",  fivePrimeFBase)
+  
+  # Everybody else's overhangs  
+    } else {
+      fivePrimeF <- paste0("gcgg",  fivePrimeFBase)
+      fivePrimeR <- paste0("gaag",  reverseComplement(fivePrimeFBase))
+      
+    }
   
   return(c(fivePrimeF, fivePrimeR))
 }
@@ -186,9 +211,9 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
 #'
 #' @examples
 
-get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
+get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   
-  homology <- substring(dnaSeq, cutSite + 1, cutSite + mh)
+  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh)
   spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
   nhSpacer <- addNonHBP(spacer)
   
@@ -201,8 +226,17 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite){
     
   
   #} else {
+  # For UFlip ON, use flip overhangs
+  if(toolSeries != 4){
     threePrimeF <- paste0("aag", threePrimeFBase)
     threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
+    
+  # For everyone else, use normal overhangs
+  } else {
+    threePrimeF <- paste0("cgg", reverseComplement(threePrimeFBase))
+    threePrimeR <- paste0("aag", threePrimeFBase) 
+  }
+    
 
   #}
   
@@ -485,21 +519,6 @@ getPadding <- function(seq, cutSite, padding, orientation){
 
 return(pad)  
 }
-
-#getPadding <- function(padding){  
-#  if(padding == 0){
-#    pad <- ""
-#    
-#  } else if(padding == 1){
-#    pad <- "A"
-#    
-#  } else if(padding == 2){
-#    pad <- "AA"
-#  }
-#  
-#  return(pad)
-#}
-
 
 #' Title
 #'
