@@ -15,24 +15,26 @@ library(plyr)
 library(rentrez)
 library(rlist)
 library(curl)
+library(httr)
+library(jsonlite)
+library(xml2)
 
 #Required files
 source("functions.R")
 source("apeShiftFunctions.R")
 source("genbankFunctions.R")
-source("validationFunctions.R")
-#source("ensemblAccessoryFunctions.R")
+source("ensemblAccessoryFunctions.R")
 
 shinyServer(function(input, output, session) {
   
   # Read in ensembl ID table
-  #ensIds <<- readRDS("2018-09-21_ensIds.RDS")
+  ensIds <<- readRDS("2018-09-21_ensIds.RDS")
   
   #Create global variables to minimize calculations and function calls
   dF  <- reactiveValues(downloadF = FALSE)
   dFF <- reactiveValues(downloadF = FALSE)
   
-  #rValues <- reactiveValues(validEnsIdMessage = "")
+  rValues <- reactiveValues(validEnsIdMessage = "")
   
   oligos <<- NULL
   gbFile <<- NULL
@@ -220,12 +222,12 @@ shinyServer(function(input, output, session) {
   ######################Gene ID############################
   #Validate ENSEMBL GeneID
   validEnsemblId <- reactive({
-    if(input$ensemblId != ""){
+    if((input$ensemblId != "") && (!is.na(input$ensemblId))){
       if(ensemblIdSpecies(input$ensemblId, bool = TRUE)){
         if(getEnsemblIdType(input$ensemblId) == "gene"){
           shiny::validate(
             need(1 == 2,
-                 "Error: Ensembl gene input detected. We do not currently support Ensembl GENE inputs; please use the Ensembl transcript ID for your target of interest.")
+                 "Error: Ensembl gene input detected. We do not support Ensembl GENE inputs; please use the Ensembl transcript ID for your target of interest.")
           )
         } else if(!getEnsemblIdType(input$ensemblId) %in% c("exon", "protein", "transcript")){
           shiny::validate(
@@ -239,7 +241,12 @@ shinyServer(function(input, output, session) {
                "Error: The Ensembl ID does not match a known Ensembl format. Please check your ID input.")
         )
       }
-    } 
+    } else if(input$ensemblId == ""){
+      shiny::validate(
+        need(1 == 2, "")
+      )
+      
+    }
   })
   
   ####################GENBANK INPUTS######################
@@ -371,6 +378,7 @@ shinyServer(function(input, output, session) {
   output$validensemblDNA <- renderText({
     rValues$validEnsDNAMessage
   })
+  
   #output$validrefseqgenbankid <- renderText({
   #    validRefSeqGenbankId()
   #})
@@ -606,7 +614,8 @@ shinyServer(function(input, output, session) {
     # Check to ensure that all other inputs are valid before proceding
     # CHECK THIS
     if(is.null(     validgRNA()) &&
-       is.null(validCrisprSeq())){ 
+       is.null(validCrisprSeq()) &&
+       is.null(validEnsemblId())){ 
       #is.null(validRefSeqGenbankId())){
       
       revFlag <- FALSE
@@ -708,7 +717,8 @@ shinyServer(function(input, output, session) {
           output$validensemblDNA <- renderText({
             shiny::validate(
               need(1 == 2,
-                   "Error: The genomic gRNA was not found in either the forward or reverse strand. Please choose a different target site.")
+                   paste0("Error: The genomic gRNA was not found in either the forward or reverse strand. ", 
+                          "Please check that your gRNA exactly matches the genomic sequence, or choose a different target site."))
             )
           })
           
@@ -734,18 +744,62 @@ shinyServer(function(input, output, session) {
         }
         
         if(proceedFlag){
-          orientation <- (if(ensemblMatch$strand.x == 1){orientation <- 0} else {orientation <- -1})
-
+          #orientation <- (if(ensemblMatch$strand.x == 1){orientation <- 0} else {orientation <- -1})
+          orientation <- input$sense
+          
           # Get the cut index
           cutI <- getGenomicCutSite(ucDNA, uCS, orientation)
+
+          startPhase <- ensemblMatch$ensembl_phase
+          endPhase   <- ensemblMatch$ensembl_end_phase
+
+          nucs <- 0
+          mod  <- 0
           
           # If automatic padding is selected, generate it
-          if(input$paddingChoice == 1){
-            if(cutI %% 3 == 0){
-              padNum <- 0
+          if(input$paddingChoiceEns == 1){
+            
+            if(startPhase != -1){
+              nucs <- as.numeric(startPhase) + cutI - (as.numeric(input$mh))
+              
+              if(nucs %% 3 == 0){
+                padNum <- 0
+              } else {
+                padNum <- 3 - (nucs %% 3)
+              }
             } else {
-              padNum <- 3 - (cutI %% 3)
+              nucs <- ((nchar(ucDNA) - (as.numeric(input$mh)) - as.numeric(endPhase)) - cutI)
+              
+              if(nucs %% 3 == 0){
+                padNum <- 0
+              } else {
+                padNum <- nucs %% 3
+              }
+              
             }
+            
+            # if(endPhase != -1){ # If the endPhase DOES NOT have non-coding stuff on its tail
+            #   nucs <- ((nchar(ucDNA) - as.numeric(input$mh)) - as.numeric(endPhase)) - cutI
+            #   
+            #   if(nucs %% 3 == 0){
+            #     padNum <- 0
+            #   } else {
+            #     padNum <- 3 - (nucs %% 3)
+            #     #padNum <- nucs %% 3
+            #   }
+            #   
+            # } else { # If it does, use the startPhase to figure stuff out
+            #   
+            #   nucs <- (cutI - as.numeric(input$mh)) - (3 - as.numeric(startPhase))
+            #   
+            #   if(nucs %% 3 == 0){
+            #     padNum <- 0
+            #   } else {
+            #     padNum <- 3 - (nucs %% 3)
+            #   }
+            # }
+            
+
           } else {
             padNum <- 0
           }
@@ -1103,7 +1157,7 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session,  "toolSeries", selected = 0)
     #updateSelectInput(session,  "")
     updateRadioButtons(session, "gRNAtype",   selected = 1)
-    updateSelectInput(session,  "mh",         selected = 24)
+    updateSelectInput(session,  "mh",         selected = 48)
     
     #Reset the inputs that will not be overwritten to their default values
     updateRadioButtons(session, "cDNAtype",      selected = 3)
@@ -1145,6 +1199,7 @@ shinyServer(function(input, output, session) {
     updateTextInput(session,    "cDNA",          value    = NA)
     updateTextInput(session,    "genbankId",     value    = NA)
     updateRadioButtons(session, "paddingChoice", selected = 1 )
+    updateTextInput(session,    "ensemblId",     value    = NA)
     #updateTextInput(session, "geneId", value = NA)
     updateSelectInput(session,  "mh",            selected = 48)
     updateSelectInput(session,  "padding",       selected = 0 )
