@@ -99,7 +99,7 @@ shinyServer(function(input, output, session) {
       #Once text has been input
       if(input$cDNA != ""){
         #Convert sequences to uppercase
-        ucDNA <- toupper(input$cDNA)
+        ucDNA <- toupper(stripWhiteSpace(input$cDNA))
         uCS <- toupper(input$crisprSeq)
         
         #Ensure that the input DNA is plain text, and only contains A, C, G, and T
@@ -107,7 +107,7 @@ shinyServer(function(input, output, session) {
           need(!str_detect(input$cDNA, "[>]"), 
                "Error: Input DNA sequence appears to be in FASTA format. Please paste plain text."),
           
-          need(!str_detect(input$cDNA, "[^ACGTacgt]"), 
+          need(!str_detect(input$cDNA, "[^ACGTacgt\\s\\v\\h]"), 
                paste0("Error: Input DNA sequence contains non-standard nucleotides. ", 
                       "Allowed nucleotides are A, C, G, and T."))
         )
@@ -172,7 +172,7 @@ shinyServer(function(input, output, session) {
        (input$cDNA      != "")){
       if(is.null(validCrisprSeq()) && 
          (is.null(validCDNA()))){
-        uDNA <- toupper(input$cDNA)
+        uDNA <- toupper(stripWhiteSpace(input$cDNA))
         uCS  <- toupper(input$crisprSeq)
         
         #Count how many times the input CRISPR target sequence appears in the cDNA sequence in the sense direction
@@ -184,7 +184,7 @@ shinyServer(function(input, output, session) {
         #If the target appears in the reverseComplement of cDNA
         if(revCount == 1 && 
            count    == 0){
-          uDNA   <- reverseComplement(input$cDNA)
+          uDNA   <- reverseComplement(toupper(stripWhitSpace(input$cDNA)))
         } 
         
         #Find ALL locations of the guide in the sequence
@@ -399,7 +399,7 @@ shinyServer(function(input, output, session) {
       
       #Convert inputs to uppercase
       guideRNA <- toupper(input$gRNA)
-      ucDNA    <- toupper(input$cDNA)
+      ucDNA    <- toupper(stripWhiteSpace(input$cDNA))
       uCS      <- toupper(input$crisprSeq)
       
       #Determine if the CRISPR is on the sense or anti-sense strand
