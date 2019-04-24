@@ -22,7 +22,7 @@ shinyUI(
              tags$div(""),
              
              ########ABOUT TAB#################################################
-             tabPanel(tags$div("GTagHD v1.3.0"),
+             tabPanel(tags$div("GTagHD v1.3.1"),
                       titlePanel(""),
                       
                       # Sidebar panel with links
