@@ -65,7 +65,7 @@ getEnsemblGeneFile <- function(accession){
   # Construct the URL
   server <- 'https://rest.ensembl.org/sequence/id/'
   
-  ext <- paste0(accession, "?type=genomic")
+  ext <- paste0(getBaseAccession(accession), "?type=genomic")
   
   # Get file from URL
   r <- httr::GET(paste(server, ext, sep = ""), httr::content_type("text/x-fasta"))
@@ -96,7 +96,7 @@ getEnsemblExonInfo <- function(accession){
   
   # Get the exonic information
   server <- "http://rest.ensembl.org"
-  ext    <- paste0("/overlap/id/", accession, "?feature=exon")
+  ext    <- paste0("/overlap/id/", getBaseAccession(accession), "?feature=exon")
   
   r <- httr::GET(paste(server, ext, sep = ""), httr::content_type("application/json"))
   
@@ -129,7 +129,7 @@ getEnsemblExonInfoG <- function(accession){
   
   # Get the exonic information
   server <- "http://rest.ensembl.org"
-  ext    <- paste0("/overlap/id/", accession1, "?object_type=gene;feature=exon")
+  ext    <- paste0("/overlap/id/", getBaseAccession(accession), "?object_type=gene;feature=exon")
   
   s <- httr::GET(paste(server, ext, sep = ""), httr::content_type("application/json"))
   
@@ -137,7 +137,7 @@ getEnsemblExonInfoG <- function(accession){
   
   # Get the exonic information
   server <- "http://rest.ensembl.org"
-  ext    <- paste0("/overlap/id/", accession, "?object_type=gene;feature=transcript")
+  ext    <- paste0("/overlap/id/", getBaseAccession(accession), "?object_type=gene;feature=transcript")
   
   r <- httr::GET(paste(server, ext, sep = ""), httr::content_type("application/json"))
   
@@ -244,7 +244,7 @@ lookupEnsemblInfo <- function(accession){
   server <- "http://rest.ensembl.org"
   ext <- "/lookup/id/"
   
-  r <- httr::GET(paste(server, ext, accession, sep = ""), httr::content_type("application/json"))
+  r <- httr::GET(paste(server, ext, getBaseAccession(accession), sep = ""), httr::content_type("application/json"))
   
   #httr::stop_for_status(r)
   
@@ -417,7 +417,7 @@ getEnsemblExonSequence <- function(accession, strand, exp5 = 0, exp3 = 0){
   # Construct the URL
   server <- 'https://rest.ensembl.org/sequence/id/'
   
-  ext <- paste0(accession, "?type=genomic;expand_5prime=", exp5, ";expand_3prime=", exp3)
+  ext <- paste0(getBaseAccession(accession), "?type=genomic;expand_5prime=", exp5, ";expand_3prime=", exp3)
   
   # Get file from URL
   r <- httr::GET(paste(server, ext, sep = ""), httr::content_type("text/x-fasta"))
@@ -657,3 +657,12 @@ processEnsSequence <- function(inSeq){
 #handleChromosomeRegion <- function(chromosome, regionStart, regionEnd){
 #	https://rest.ensembl.org/documentation/info/sequence_region
 #}
+
+#' getBaseAccession
+#' 
+#' 
+
+getBaseAccession <- function(accession){
+  baseAcc <- strsplit(accession, ".", fixed = TRUE)	
+  return(unlist(baseAcc[[1]][1]))
+}
