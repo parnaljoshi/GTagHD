@@ -77,7 +77,7 @@ You can copy and paste the code blocks below into your R/RStudio console to run 
 #Install packages required to run GTagHD; you can also run this code to update these packages
 
 #Install CRAN packages
-install.packages(c("shiny", "shinyjs", "Rcpp", "plyr", "stringr", "rlist", "rentrez"))
+install.packages(c("shiny", "shinyjs", "Rcpp", "plyr", "stringr", "rlist", "rentrez", "xml2"))
 
 #Install 'Biostrings' package from Bioconductor
 source("https://bioconductor.org/biocLite.R")
