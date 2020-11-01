@@ -27,7 +27,7 @@ shinyUI(
                       
                       # Sidebar panel with links
                       column(2, wellPanel(
-                        tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                        tags$div(tags$span(a(href         = "http://3.17.87.198/",               target = "_blank", 
                                              tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                         tags$br(),
                         tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -39,10 +39,10 @@ shinyUI(
                         tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                              tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                        tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                              tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                        tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                              tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                         tags$br(),
                         tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
@@ -62,7 +62,7 @@ shinyUI(
                       
                       # Sidebar panel with links
                       column(2, wellPanel(
-                        tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                        tags$div(tags$span(a(href         = "http://3.17.87.198",               target = "_blank", 
                                              tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                         tags$br(),
                         tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -74,10 +74,10 @@ shinyUI(
                         tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                              tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                        tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                              tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                         tags$br(),
-                        tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                        tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                              tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                         tags$br(),
                         tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
@@ -532,7 +532,7 @@ shinyUI(
                
                # Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                 tags$div(tags$span(a(href         = "http://3.17.87.198",               target = "_blank", 
                                       tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -544,10 +544,10 @@ shinyUI(
                  tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                       tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                       tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
@@ -559,16 +559,16 @@ shinyUI(
                column(9, wellPanel(
                  h3("Download GTagHD"),
                  tags$p(HTML(paste0("A standalone version of this code can be freely downloaded from our ", 
-                                    tags$a(href = "https://github.com/Dobbs-Lab/GTagHD", target = "_blank", "GitHub repository"),
+                                    tags$a(href = "https://github.com/FriedbergLab/GTagHD", target = "_blank", "GitHub repository"),
                                     "."))),
                  
                  tags$p(HTML(paste0("There are extensive installation/usage instructions available in the GitHub ", 
-                                    tags$a(href = "https://github.com/Dobbs-Lab/GTagHD#how-to-run-gtaghd-locally", target = "_blank", "README"), 
+                                    tags$a(href = "https://github.com/FriedbergLab/GTagHD#how-to-run-gtaghd-locally", target = "_blank", "README"), 
                                     " file."))),
                  tags$p("You can clone the repository with the following git command:"),
-                 tags$p(tags$code("git clone https://github.com/Dobbs-Lab/GTagHD.git"), style = "text-align:center;"),
+                 tags$p(tags$code("git clone https://github.com/FriedbergLab/GTagHD.git"), style = "text-align:center;"),
                  tags$p(HTML(paste0("GTagHD is available under the GNU General Public License v3 (GPL 3.0). You can read the license ",
-                                    tags$a(href = "https://github.com/Dobbs-Lab/GTagHD/blob/master/LICENSE", target = "_blank", "here"),
+                                    tags$a(href = "https://github.com/FriedbergLab/GTagHD/blob/master/LICENSE", target = "_blank", "here"),
                                     "."))),
                  tags$p(HTML(paste0("The GTagHD R code is provided as-is; please be aware that you modify the code at your own risk. ",
                                     "We are unable to provide technical support for modified versions.")))
@@ -578,10 +578,10 @@ shinyUI(
                  h3("Run GTagHD Locally"),
                  
                  tags$p(HTML(paste0("If you have R installed on your system, you can also follow the instructions ",
-                                    tags$a(href = "https://github.com/Dobbs-Lab/GTagHD#3-run-gtaghd-locally", target = "_blank", "here"),
+                                    tags$a(href = "https://github.com/FriedbergLab/GTagHD#3-run-gtaghd-locally", target = "_blank", "here"),
                                     " to easily run the GTagHD RShiny app from R, without dealing with Git."))),
                  p("GTagHD is also available as a Docker container image. You can clone the Docker image using the following command:"),
-                 tags$p(tags$code("sudo docker pull cmmann/gtaghd"), style = "text-align:center;")
+                 tags$p(tags$code("sudo docker pull parnaljoshi/gtaghd"), style = "text-align:center;")
                ),
                  
                wellPanel(
@@ -758,7 +758,7 @@ shinyUI(
                titlePanel(""),
                # Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                 tags$div(tags$span(a(href         = "http://3.17.87.198",               target = "_blank", 
                                       tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -770,10 +770,10 @@ shinyUI(
                  tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                       tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                       tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
@@ -799,7 +799,7 @@ shinyUI(
                
                # Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                 tags$div(tags$span(a(href         = "http://3.17.87.198",               target = "_blank", 
                                       tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -811,10 +811,10 @@ shinyUI(
                  tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                       tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                       tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
@@ -844,7 +844,7 @@ shinyUI(
                
                # Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                 tags$div(tags$span(a(href         = "http://3.17.87.198",               target = "_blank", 
                                       tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -856,10 +856,10 @@ shinyUI(
                  tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                       tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                       tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
@@ -892,7 +892,7 @@ shinyUI(
                
                # Sidebar panel with links
                column(2, wellPanel(
-                 tags$div(tags$span(a(href         = "http://www.genesculpt.org",               target = "_blank", 
+                 tags$div(tags$span(a(href         = "http://3.17.87.198",               target = "_blank", 
                                       tags$img(src = "GSS logo small.png",                      width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.iastate.edu/",                target = "_blank", 
@@ -904,10 +904,10 @@ shinyUI(
                  tags$div(tags$span(a(href         = "https://www.genomewritersguild.org/",     target = "_blank", 
                                       tags$img(src = "genome-writers-guild-logo_DAC.png",       width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://github.com/Dobbs-Lab/GTagHD",     target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://github.com/FriedbergLab/GTagHD",     target = "_blank", 
                                       tags$img(src = "GitHub_Logo.png",                         width  = "100%")))),
                  tags$br(),
-                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/cmmann/gtaghd",  target = "_blank", 
+                 tags$div(tags$span(a(href         = "https://hub.docker.com/r/parnaljoshi/gtaghd",  target = "_blank", 
                                       tags$img(src = "Docker_Logo.png",                         width  = "100%")))),
                  tags$br(),
                  tags$div(tags$span(a(href         = "https://www.addgene.org/Jeffrey_Essner/", target = "_blank",
