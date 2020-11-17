@@ -586,7 +586,7 @@ shinyUI(
                  
                wellPanel(
                  h3("Download GeneWeld Protocol"),
-                 tags$p("Click", tags$a(href="2019-03-27_GeneWeld_Protocol.pdf", target="_blank", "here"), "to download the GeneWeld protocol.")
+                 tags$p("Click", tags$a(href="New_GeneWeldProtocol_102720.pdf", target="_blank", "here"), "to download the GeneWeld protocol.")
                ),  
                  
                
