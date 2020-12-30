@@ -4,21 +4,21 @@ This is a repository for the GTagHD knock-in tool.
 You can run GTagHD online through a web interface here: http://genesculpt.org/gtaghd/
  
 
-### If you already have R and/or RStudio installed, you can jump to [here](https://github.com/Dobbs-Lab/GTagHD#run-gtaghd-locally) to immmediately start running GTagHD locally.
+### If you already have R and/or RStudio installed, you can jump to [here](https://github.com/FriedbergLab/GTagHD#run-gtaghd-locally) to immmediately start running GTagHD locally.
 
-### If you are having issues running GTagHD locally, please check the [Troubleshooting](https://github.com/Dobbs-Lab/GTagHD#troubleshooting) section before requesting help.
+### If you are having issues running GTagHD locally, please check the [Troubleshooting](https://github.com/FriedbergLab/GTagHD#troubleshooting) section before requesting help.
  
 
 # How to Run GTagHD Locally
 You will need to have the ability to install software on the computer you are using to run GTagHD locally; this may require administrator privileges. 
 
-[1. Download and Install R](https://github.com/Dobbs-Lab/GTagHD#1-download-and-install-r)
+[1. Download and Install R](https://github.com/FriedbergLab/GTagHD#1-download-and-install-r)
 
-[2. Download and Install RStudio](https://github.com/Dobbs-Lab/GTagHD#2-download-and-install-rstudio-optional) (optional)
+[2. Download and Install RStudio](https://github.com/FriedbergLab/GTagHD#2-download-and-install-rstudio-optional) (optional)
 
-[3. Run GTagHD locally](https://github.com/Dobbs-Lab/GTagHD#3-run-gtaghd-locally)
+[3. Run GTagHD locally](https://github.com/FriedbergLab/GTagHD#3-run-gtaghd-locally)
 
-[Troubleshooting](https://github.com/Dobbs-Lab/GTagHD#troubleshooting)
+[Troubleshooting](https://github.com/FriedbergLab/GTagHD#troubleshooting)
 
 ## [1. Download and Install R](#1-download-and-install-r)
 GTagHD requires the latest version of R in order to run offline. 
@@ -92,7 +92,7 @@ biocLite("biomaRt")
 library(shiny)
 
 #Retrieve, load, and run GTagHD from GitHub
-runGitHub("GTagHD", "Dobbs-Lab")
+runGitHub("GTagHD", "FriedbergLab")
 ```
 
 You're all set!
