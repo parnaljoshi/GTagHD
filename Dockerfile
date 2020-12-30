@@ -1,6 +1,6 @@
 FROM openanalytics/r-base
 
-MAINTAINER Carla Mann "genesculptsuitehelp@gmail.com"
+MAINTAINER FriedbergLab "genesculptsuitehelp@gmail.com"
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
