@@ -243,8 +243,10 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
     
     # For everyone else, use normal overhangs
   } else {
-    threePrimeF <- paste0("cgg", reverseComplement(threePrimeFBase))
-    threePrimeR <- paste0("aag", threePrimeFBase) 
+    #threePrimeF <- paste0("cgg", reverseComplement(threePrimeFBase))
+    #threePrimeR <- paste0("aag", threePrimeFBase) 
+    threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
+    threePrimeR <- paste0("cgg", threePrimeFBase) 
     
   }
     
