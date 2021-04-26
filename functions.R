@@ -32,26 +32,26 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
       fiveData  <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
       threeData <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
       
-    } else {
+    #} else {
       # For everybody else:
       
       #' Calculate the 5' oligo targeting domains
-      fiveData  <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+    #  fiveData  <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
       
-      progress$set(detail = "generating 3' oligos", value = 0.8)
+    #  progress$set(detail = "generating 3' oligos", value = 0.8)
       #' Calculate the 3' oligo targeting domains
-      threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
+    #  threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
       
     }
-  #} else {
-  #  progress$set(detail = "generating 5' oligos", value = 0.6)
+  } else { #Homology try fix 24 April 2021
+    progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
-  #  fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+    fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
     
-  #  progress$set(detail = "generating 3' oligos", value = 0.8)
+    progress$set(detail = "generating 3' oligos", value = 0.8)
     #' Calculate the 3' oligo targeting domains
-  #  threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
-  #}
+    threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+  } #End homology fix
 
   return(c(fiveData, threeData))
 }
@@ -185,11 +185,11 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
   #  fivePrimeRevF <- paste0("catgg", reverseComplement(fivePrimeRevFBase),"g")
   #  fivePrimeRevR <- paste0("ggccg", fivePrimeRevFBase, "g")
     
-  #fivePrimeRevF <- paste0("aag",  reverseComplement(fivePrimeRevFBase))
-  #fivePrimeRevR <- paste0("cgg",  fivePrimeRevFBase)
+  fivePrimeRevF <- paste0("aag",  reverseComplement(fivePrimeRevFBase))
+  fivePrimeRevR <- paste0("cgg",  fivePrimeRevFBase)
   # Trying to fix homology arm problem
-  fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
-  fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
+  #fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
+  #fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
   #} else {
   #  fivePrimeRevF <- paste0("gcgg",  reverseComplement(fivePrimeRevFBase))
   #  if(toolSeries == 1){
