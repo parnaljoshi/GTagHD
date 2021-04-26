@@ -42,7 +42,7 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
       #' Calculate the 3' oligo targeting domains
     #  threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
       
-    }
+    #}
   } else { #Homology try fix 24 April 2021
     progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
