@@ -218,8 +218,7 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
 
 get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   
-  #homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh)
-  homology <- substring(dnaSeq, cutSite + 1,      cutSite - mh) #Trying to fix the homology arms problem April 24 2021
+  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh)
   spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
   nhSpacer <- addNonHBP(spacer)
   
@@ -234,8 +233,11 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   #} else {
   # For UFlip ON, use flip overhangs
   if(toolSeries == 4){
-    threePrimeF <- paste0("aag", threePrimeFBase)
-    threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
+    #threePrimeF <- paste0("aag", threePrimeFBase)
+    #threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
+    # Trying to fix the homology arms problem April 24 2021
+    threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
+    threePrimeR <- paste0("cgg", threePrimeFBase)
     
     # For custom series with no overhangs
   } else if(toolSeries == 5){
