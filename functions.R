@@ -233,11 +233,11 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   #} else {
   # For UFlip ON, use flip overhangs
   if(toolSeries == 4){
-    #threePrimeF <- paste0("aag", threePrimeFBase)
-    #threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
+    threePrimeF <- paste0("aag", threePrimeFBase)
+    threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
     # Trying to fix the homology arms problem April 24 2021
-    threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
-    threePrimeR <- paste0("cgg", threePrimeFBase)
+    # threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
+    # threePrimeR <- paste0("cgg", threePrimeFBase)
     
     # For custom series with no overhangs
   } else if(toolSeries == 5){
