@@ -173,8 +173,8 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
 
 get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, orientation, toolSeries){
   #homology <- substring(dnaSeq, cutSite - 1,      cutSite + mh)
-  homology <- substring(dnaSeq, cutSite,      cutSite + mh + 1) #Trying to fix homology arm problem April 24 2021
-  spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
+  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh + 2) #Trying to fix homology arm problem April 24 2021
+  spacer   <- substring(dnaSeq, cutSite + mh + 2, cutSite + mh + 4)
   #spacer   <- substring(dnaSeq, cutSite + mh - 1, cutSite + mh + 2)
   nhSpacer <- addNonHBP(spacer)
   
