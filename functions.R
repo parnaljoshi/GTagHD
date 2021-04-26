@@ -180,7 +180,8 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
   
   #fivePrimeRevFBase <- paste0(getPadding(padding), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(getPadding(dnaSeq, cutSite, padding, orientation), homology, nhSpacer, reverseComplement(passSeq))
-  fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
+  #fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
+  fivePrimeRevFBase <- paste0(homology, nhSpacer, passSeq) #Trying to fix homology arm problem April 24 2021
   
   #Add cloning sites if needed
   #if(nchar(passSeq) > 0 && toolSeries == 0){
