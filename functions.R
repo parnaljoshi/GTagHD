@@ -181,15 +181,15 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
   #fivePrimeRevFBase <- paste0(getPadding(padding), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(getPadding(dnaSeq, cutSite, padding, orientation), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
-  fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq)) #Trying to fix oligo problem April 24 2021
+  fivePrimeRevFBase <- paste0(homology, nhSpacer, passSeq) #Trying to fix oligo problem April 24 2021
   
   #Add cloning sites if needed
   #if(nchar(passSeq) > 0 && toolSeries == 0){
   #  fivePrimeRevF <- paste0("catgg", reverseComplement(fivePrimeRevFBase),"g")
   #  fivePrimeRevR <- paste0("ggccg", fivePrimeRevFBase, "g")
     
-  fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
-  fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
+  fivePrimeRevF <- paste0("aag",  reverseComplement(fivePrimeRevFBase))
+  fivePrimeRevR <- paste0("cgg",  fivePrimeRevFBase)
   # Trying to fix oligo problem
   #fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
   #fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
