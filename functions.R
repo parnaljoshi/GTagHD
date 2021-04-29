@@ -188,9 +188,9 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
   #  fivePrimeRevF <- paste0("catgg", reverseComplement(fivePrimeRevFBase),"g")
   #  fivePrimeRevR <- paste0("ggccg", fivePrimeRevFBase, "g")
     
-  fivePrimeRevF <- paste0("aag",  reverseComplement(fivePrimeRevFBase))
-  fivePrimeRevR <- paste0("cgg",  fivePrimeRevFBase)
-  # Trying to fix homology arm problem
+  fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
+  fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
+  # Trying to fix oligo problem
   #fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
   #fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
   #} else {
