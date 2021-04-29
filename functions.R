@@ -173,7 +173,7 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
 
 get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, orientation, toolSeries){
   #homology <- substring(dnaSeq, cutSite - 1,      cutSite + mh)
-  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh + 2) #Trying to fix homology arm problem April 24 2021
+  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh + 2) #Trying to fix oligo problem April 24 2021
   spacer   <- substring(dnaSeq, cutSite + mh + 2, cutSite + mh + 4)
   #spacer   <- substring(dnaSeq, cutSite + mh - 1, cutSite + mh + 2)
   nhSpacer <- addNonHBP(spacer)
@@ -181,7 +181,7 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
   #fivePrimeRevFBase <- paste0(getPadding(padding), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(getPadding(dnaSeq, cutSite, padding, orientation), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
-  fivePrimeRevFBase <- paste0(homology, nhSpacer, passSeq) #Trying to fix homology arm problem April 24 2021
+  fivePrimeRevFBase <- paste0(homology, nhSpacer, passSeq) #Trying to fix oligo problem April 24 2021
   
   #Add cloning sites if needed
   #if(nchar(passSeq) > 0 && toolSeries == 0){
