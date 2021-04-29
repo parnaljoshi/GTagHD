@@ -116,6 +116,10 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
   #Generate a three nucleotide-long spacer that is not homologous to spacer
   nhSpacer <- addNonHBP(spacer)
   
+  print(gRNA)
+  print(nhSpacer)
+  print(homology)
+  
   if(toolSeries == 4){
     #Create the base five prime oligo
     fivePrimeFBase <- paste0(nhSpacer, homology, reverseComplement(gRNA))
