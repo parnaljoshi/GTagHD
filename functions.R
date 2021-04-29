@@ -295,6 +295,10 @@ get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, orientation, 
   #Generate a three nucleotide-long spacer that is not homologous to spacer
   nhSpacer <- addNonHBP(spacer)
   
+  print(gRNA)
+  print(nhSpacer)
+  print(homology)
+  
   #Create the base five prime oligo
   threePrimeRevFBase <- paste0(gRNA, nhSpacer, homology, getPadding(dnaSeq, cutSite, padding, orientation))
   
