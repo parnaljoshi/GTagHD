@@ -180,11 +180,6 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
   #spacer   <- substring(dnaSeq, cutSite + mh - 1, cutSite + mh + 2)
   nhSpacer <- addNonHBP(spacer)
   
-  print(passSeq)
-  print(nhSpacer)
-  print(homology)
-  print(spacer)
-  
   #fivePrimeRevFBase <- paste0(getPadding(padding), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(getPadding(dnaSeq, cutSite, padding, orientation), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
