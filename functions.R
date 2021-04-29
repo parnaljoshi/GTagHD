@@ -111,7 +111,7 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
   
   #Get the homologous section from the genome
   #homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite) #Old
-  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite) #Oligo fix?
+  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite + 2) #Oligo fix?
   #Get the next three nucleotides
   spacer   <- substring(toupper(dnaSeq), cutSite - (mh + 2), cutSite - mh)
   #Generate a three nucleotide-long spacer that is not homologous to spacer
