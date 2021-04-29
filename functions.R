@@ -304,11 +304,11 @@ get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, orientation, 
  #   threePrimeRevF <- paste0("aattc", reverseComplement(threePrimeRevFBase), "c")
  #   threePrimeRevR <- paste0("ggatc", threePrimeRevFBase, "c")
  # } else {
-    threePrimeRevF <- paste0("gcgg", reverseComplement(threePrimeRevFBase))
+    threePrimeRevF <- paste0("atcc", reverseComplement(threePrimeRevFBase))
     if(toolSeries == 1){
       threePrimeRevR <- paste0("gaag", threePrimeRevFBase)
     } else {
-      threePrimeRevR <- paste0("atcc", threePrimeRevFBase)
+      threePrimeRevR <- paste0("gcgg", threePrimeRevFBase)
     }
     
   #}
