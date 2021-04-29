@@ -47,12 +47,12 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
     progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
     #fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries) #Old 
-     fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(passSeq), mh, cutSite, padding, orientation, toolSeries) #Oligo fix?
+     fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries) #Oligo fix?
     
     progress$set(detail = "generating 3' oligos", value = 0.8)
     #' Calculate the 3' oligo targeting domains
     #threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries) #Old
-    threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(passSeq), mh, cutSite, padding, orientation, toolSeries)  #Oligo fix?
+    threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)  #Oligo fix?
   } #End homology fix
 
   return(c(fiveData, threeData))
