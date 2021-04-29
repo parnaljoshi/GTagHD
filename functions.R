@@ -116,10 +116,6 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
   #Generate a three nucleotide-long spacer that is not homologous to spacer
   nhSpacer <- addNonHBP(spacer)
   
-  print(gRNA)
-  print(nhSpacer)
-  print(homology)
-  
   if(toolSeries == 4){
     #Create the base five prime oligo
     fivePrimeFBase <- paste0(nhSpacer, homology, reverseComplement(gRNA))
@@ -289,7 +285,7 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
 
 get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, orientation, padding, toolSeries){
   #Get the homologous section from the genome
-  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
+  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite + 2)
   #Get the next three nucleotides
   spacer   <- substring(toupper(dnaSeq), cutSite - (mh + 2), cutSite - mh)
   #Generate a three nucleotide-long spacer that is not homologous to spacer
