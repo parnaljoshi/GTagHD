@@ -307,8 +307,8 @@ get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, orientation, 
  # } else {
     #threePrimeRevF <- paste0("atcc", reverseComplement(threePrimeRevFBase))  #Old
     if(toolSeries == 1){
-      threePrimeRevR <- paste0("gaag", threePrimeRevFBase)
-      threePrimeRevF <- paste0("gccg", reverseComplement(threePrimeRevFBase)) #oligo overhang fix?
+      threePrimeRevR <- paste0("gcgg", threePrimeRevFBase)
+      threePrimeRevF <- paste0("gaag", reverseComplement(threePrimeRevFBase)) #oligo overhang fix?
     } else {
       threePrimeRevR <- paste0("gcgg", threePrimeRevFBase)
       threePrimeRevF <- paste0("atcc", reverseComplement(threePrimeRevFBase)) #Oligo overhang fix?
