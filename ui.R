@@ -875,7 +875,7 @@ shinyUI(
                       ),
                  
                    tags$iframe(id           = "googleform", 
-                               src          = paste0("https://docs.google.com/forms/d/e/1FAIpQLScrn7aI139IKLax5W0Gz8t3KGbc5p_UgtHNc7wVFi_U5hRbcw/viewform?usp=sf_link"),
+                               src          = paste0("https://docs.google.com/forms/d/e/1FAIpQLScrn7aI139IKLax5W0Gz8t3KGbc5p_UgtHNc7wVFi_U5hRbcw/viewform?embedded=true"),
                                width        = 760,
                                height       = 2000,
                                frameborder  = 0,
