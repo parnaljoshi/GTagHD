@@ -870,14 +870,12 @@ shinyUI(
                #Text area in center of page
                column(9, 
                       wellPanel(
-                        p("Please use the form below, or email us directly at GeneSculptSuite@gmail.com, to report issues and request support."),
+                        p("Please use the form below, or email us directly at parnal@iastate.edu, to report issues and request support."),
                         p("Please note that GTagHD requires the latest version of Javascript to be enabled for full functionality.")
                       ),
                  
                    tags$iframe(id           = "googleform", 
-                               src          = paste0("https://docs.google.com/forms/d/e/1FAIpQLSeq9aDRj6EOCskBwPsA2PFQ2LsKxT4v85",
-                                                     "-rGTlYQOk0n8X2Gw/viewform?usp=pp_url&entry.358268393&entry.1646278736=", 
-                                                     "GTagHD&entry.1934309806&entry.565411344&entry.754537383&entry.826100992"),
+                               src          = paste0("https://docs.google.com/forms/d/e/1FAIpQLScrn7aI139IKLax5W0Gz8t3KGbc5p_UgtHNc7wVFi_U5hRbcw/viewform?usp=sf_link"),
                                width        = 760,
                                height       = 2000,
                                frameborder  = 0,
