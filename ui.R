@@ -211,8 +211,11 @@ shinyUI(
                           
                           radioButtons("sense",
                                        label = paste0("Is your gRNA sequence on the forward strand or the reverse strand?"),
-                                       choices = c("Forward strand (sense strand)"    = 1,
-                                                   "Reverse strand (antisense strand)" = 0),
+                                       #choices = c("Forward strand (sense strand)"    = 1,
+                                       #            "Reverse strand (antisense strand)" = 0),
+                                       
+                                       choices = c("Reverse strand (antisense strand)"    = 1,      #July 2021 fix
+                                                   "Forward strand (sense strand)" = 0),
                                        selected = 0,
                                        inline = TRUE)
                         ),

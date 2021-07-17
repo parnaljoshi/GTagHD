@@ -32,28 +32,26 @@ doCalculations <- function(dnaSeq, crisprSeq, gRNA, mh, padding, revFlag, orient
       fiveData  <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
       threeData <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
       
-    #} else {
+    } else {
       # For everybody else:
       
       #' Calculate the 5' oligo targeting domains
-    #  fiveData  <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+      fiveData  <- get5Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
       
-    #  progress$set(detail = "generating 3' oligos", value = 0.8)
+      progress$set(detail = "generating 3' oligos", value = 0.8)
       #' Calculate the 3' oligo targeting domains
-    #  threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
+      threeData <- get3Prime(toupper(dnaSeq),        toupper(crisprSeq), toupper(gRNA), mh, cutSite, toolSeries)
       
-    #}
-  } else { #Homology try fix 24 April 2021
-    progress$set(detail = "generating 5' oligos", value = 0.6)
+    }
+  #} else {
+  #  progress$set(detail = "generating 5' oligos", value = 0.6)
     #' Calculate the 5' oligo targeting domains
-    #fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries) #Old 
-     fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries) #Oligo fix?
+  #  fiveData  <- get5PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
     
-    progress$set(detail = "generating 3' oligos", value = 0.8)
+  #  progress$set(detail = "generating 3' oligos", value = 0.8)
     #' Calculate the 3' oligo targeting domains
-    #threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries) #Old
-    threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)  #Oligo fix?
-  } #End homology fix
+  #  threeData <- get3PrimeRevFlag(toupper(dnaSeq), toupper(crisprSeq), toupper(gRNA), mh, cutSite, padding, orientation, toolSeries)
+  #}
 
   return(c(fiveData, threeData))
 }
@@ -110,8 +108,7 @@ getGenomicCutSite <- function(dnaSeq, crisprSeq, orientation){
 get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation, toolSeries){
   
   #Get the homologous section from the genome
-  #homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite) #Old
-  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite + 2) #Oligo fix?
+  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
   #Get the next three nucleotides
   spacer   <- substring(toupper(dnaSeq), cutSite - (mh + 2), cutSite - mh)
   #Generate a three nucleotide-long spacer that is not homologous to spacer
@@ -175,27 +172,21 @@ get5Prime <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, padding, orientation
 #' @examples
 
 get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, orientation, toolSeries){
-  #homology <- substring(dnaSeq, cutSite - 1,      cutSite + mh)
-  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh) #Trying to fix oligo problem April 24 2021
+  homology <- substring(dnaSeq, cutSite - 1,      cutSite + mh)
   spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
-  #spacer   <- substring(dnaSeq, cutSite + mh - 1, cutSite + mh + 2)
   nhSpacer <- addNonHBP(spacer)
   
   #fivePrimeRevFBase <- paste0(getPadding(padding), homology, nhSpacer, reverseComplement(passSeq))
   #fivePrimeRevFBase <- paste0(getPadding(dnaSeq, cutSite, padding, orientation), homology, nhSpacer, reverseComplement(passSeq))
-  #fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
-  fivePrimeRevFBase <- paste0(homology, nhSpacer, passSeq) #Trying to fix oligo problem April 24 2021
+  fivePrimeRevFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
   
   #Add cloning sites if needed
   #if(nchar(passSeq) > 0 && toolSeries == 0){
   #  fivePrimeRevF <- paste0("catgg", reverseComplement(fivePrimeRevFBase),"g")
   #  fivePrimeRevR <- paste0("ggccg", fivePrimeRevFBase, "g")
     
-  fivePrimeRevF <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
-  fivePrimeRevR <- paste0("aag",  fivePrimeRevFBase)
-  # Trying to fix oligo problem
-  #fivePrimeRevF <- paste0("aag",  fivePrimeRevFBase)
-  #fivePrimeRevR <- paste0("cgg",  reverseComplement(fivePrimeRevFBase))
+  fivePrimeRevF <- paste0("aag",  reverseComplement(fivePrimeRevFBase))
+  fivePrimeRevR <- paste0("cgg",  fivePrimeRevFBase)
   #} else {
   #  fivePrimeRevF <- paste0("gcgg",  reverseComplement(fivePrimeRevFBase))
   #  if(toolSeries == 1){
@@ -227,10 +218,8 @@ get3PrimeRevFlag <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, padding, o
 
 get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   
-  #homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh)
-  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh) #Trying to fix homology arm problem April 24 2021
-  spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3) #Trying to fix homology arm problem April 24 2021
-  #spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
+  homology <- substring(dnaSeq, cutSite + 1,      cutSite + mh)
+  spacer   <- substring(dnaSeq, cutSite + mh + 1, cutSite + mh + 3)
   nhSpacer <- addNonHBP(spacer)
   
   threePrimeFBase <- paste0(homology, nhSpacer, reverseComplement(passSeq))
@@ -246,9 +235,6 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   if(toolSeries == 4){
     threePrimeF <- paste0("aag", threePrimeFBase)
     threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase))
-    # Trying to fix the homology arms problem April 24 2021
-    # threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
-    # threePrimeR <- paste0("cgg", threePrimeFBase)
     
     # For custom series with no overhangs
   } else if(toolSeries == 5){
@@ -259,8 +245,10 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
   } else {
     #threePrimeF <- paste0("cgg", reverseComplement(threePrimeFBase))
     #threePrimeR <- paste0("aag", threePrimeFBase) 
-    threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
-    threePrimeR <- paste0("cgg", threePrimeFBase) 
+    #threePrimeF <- paste0("aag", reverseComplement(threePrimeFBase))
+    #threePrimeR <- paste0("cgg", threePrimeFBase) 
+    threePrimeF <- paste0("aag", threePrimeFBase)  #July 2021 fix
+    threePrimeR <- paste0("cgg", reverseComplement(threePrimeFBase)) #July 2021 fix
     
   }
     
@@ -286,16 +274,11 @@ get3Prime <- function(dnaSeq, crisprSeq, passSeq, mh, cutSite, toolSeries){
 
 get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, orientation, padding, toolSeries){
   #Get the homologous section from the genome
-  #homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)  #Old
-  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite) #oligo fix?
+  homology <- substring(toupper(dnaSeq), cutSite - (mh - 1), cutSite)
   #Get the next three nucleotides
   spacer   <- substring(toupper(dnaSeq), cutSite - (mh + 2), cutSite - mh)
   #Generate a three nucleotide-long spacer that is not homologous to spacer
   nhSpacer <- addNonHBP(spacer)
-  
-  print(gRNA)
-  print(nhSpacer)
-  print(homology)
   
   #Create the base five prime oligo
   threePrimeRevFBase <- paste0(gRNA, nhSpacer, homology, getPadding(dnaSeq, cutSite, padding, orientation))
@@ -305,13 +288,11 @@ get5PrimeRevFlag <- function(dnaSeq, crisprSeq, gRNA, mh, cutSite, orientation, 
  #   threePrimeRevF <- paste0("aattc", reverseComplement(threePrimeRevFBase), "c")
  #   threePrimeRevR <- paste0("ggatc", threePrimeRevFBase, "c")
  # } else {
-    #threePrimeRevF <- paste0("atcc", reverseComplement(threePrimeRevFBase))  #Old
+    threePrimeRevF <- paste0("gcgg", reverseComplement(threePrimeRevFBase))
     if(toolSeries == 1){
-      threePrimeRevR <- paste0("gcgg", threePrimeRevFBase)
-      threePrimeRevF <- paste0("gaag", reverseComplement(threePrimeRevFBase)) #oligo overhang fix?
+      threePrimeRevR <- paste0("gaag", threePrimeRevFBase)
     } else {
-      threePrimeRevR <- paste0("gcgg", threePrimeRevFBase)
-      threePrimeRevF <- paste0("atcc", reverseComplement(threePrimeRevFBase)) #Oligo overhang fix?
+      threePrimeRevR <- paste0("atcc", threePrimeRevFBase)
     }
     
   #}
@@ -682,4 +663,3 @@ getBasePlasmid <- function(plasType){
          "www/plasmids/pGTag-TagRFP-caax-SV40_(071618).ape",
          "www/plasmids/pGTag-TagRFP-SV40_(071618).ape")
 }
-
