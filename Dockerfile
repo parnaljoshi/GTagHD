@@ -1,6 +1,6 @@
 FROM openanalytics/r-base
 
-MAINTAINER FriedbergLab "genesculptsuitehelp@gmail.com"
+MAINTAINER FriedbergLab "parnal@iastate.edu"
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
